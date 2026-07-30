@@ -1,0 +1,686 @@
+import SwiftUI
+import SwiftData
+
+/// 新しい日記を作成する画面。
+///
+/// 最初に必要なのは「今の気分」だけなので、詳細項目は折りたたんでいる。
+/// 既存のMoodEntryの保存項目は維持し、入力の順番と見せ方だけを整理している。
+struct NewMoodEntryView: View {
+    @Environment(\.modelContext) private var context
+
+    @State private var selectedMoodScore = 4
+    @State private var selectedRecordType = "今現在の気分"
+    @State private var selectedEmotions: Set<String> = []
+    @State private var notes = ""
+    @State private var activities: Set<String> = []
+    @State private var gratitude = ""
+    @State private var reflections = ""
+    @State private var selectedInfluences: Set<String> = []
+    @State private var selectedLifeFactors: Set<String> = []
+
+    @State private var isShowingDetails = false
+    @State private var expandedDetails: Set<DetailSection> = []
+    @State private var showingDiscardConfirmation = false
+    @State private var showingSaveError = false
+    @State private var saveErrorMessage = ""
+    @State private var isSaving = false
+    @FocusState private var focusedField: InputField?
+
+    private let entryToEdit: MoodEntry?
+    let onSave: (MoodEntry) -> Void
+    let onCancel: () -> Void
+
+    init(
+        entryToEdit: MoodEntry? = nil,
+        onSave: @escaping (MoodEntry) -> Void,
+        onCancel: @escaping () -> Void = {}
+    ) {
+        self.entryToEdit = entryToEdit
+        self.onSave = onSave
+        self.onCancel = onCancel
+
+        _selectedMoodScore = State(initialValue: entryToEdit?.moodScore ?? 4)
+        _selectedRecordType = State(initialValue: entryToEdit?.recordType ?? "今現在の気分")
+        _selectedEmotions = State(initialValue: Set(entryToEdit?.emotions ?? []))
+        _selectedInfluences = State(initialValue: Set(entryToEdit?.influences ?? []))
+        _selectedLifeFactors = State(initialValue: Set(entryToEdit?.lifeFactors ?? []))
+        _activities = State(initialValue: Set(entryToEdit?.activities ?? []))
+        _notes = State(initialValue: entryToEdit?.notes ?? "")
+        _gratitude = State(initialValue: entryToEdit?.gratitude ?? "")
+        _reflections = State(initialValue: entryToEdit?.reflections ?? "")
+        _isShowingDetails = State(initialValue: entryToEdit.map { entry in
+            !entry.emotions.isEmpty ||
+            !entry.influences.isEmpty ||
+            !entry.lifeFactors.isEmpty ||
+            !entry.activities.isEmpty ||
+            !entry.gratitude.isEmpty ||
+            !entry.reflections.isEmpty
+        } ?? false)
+    }
+
+    private let recordTypes = ["今現在の気分", "今日一日の気分"]
+    private let moodLabels = ["非常に不快", "不快", "やや不快", "普通", "やや快適", "快適", "非常に快適"]
+
+    private let emotionOptions = [
+        "幸せ", "満足", "楽しい", "誇り", "感謝", "平和", "希望", "興奮",
+        "不安", "ストレス", "悲しみ", "怒り", "不満", "疲労", "孤独", "混乱"
+    ]
+
+    private let influenceOptions = [
+        "タスク", "健康", "友達", "家族", "天気", "仕事", "学校", "お金",
+        "恋愛", "趣味", "ニュース", "音楽", "食事", "休息"
+    ]
+
+    private let lifeFactorOptions = ["睡眠", "運動", "日光", "食事", "水分", "瞑想", "読書", "散歩"]
+    private let activityOptions = ["勉強", "実験", "運動", "読書", "友人との時間", "家族との時間", "趣味", "休息"]
+
+    var body: some View {
+        ScrollViewReader { scrollProxy in
+            ScrollView {
+                VStack(spacing: 16) {
+                    recordTypeSection
+                    moodSelectionSection
+                    memoSection
+
+                    if isShowingDetails {
+                        detailsSection(scrollProxy: scrollProxy)
+                    } else {
+                        detailPrompt
+                    }
+                }
+                .frame(maxWidth: 760)
+                .padding(.horizontal, 24)
+                .padding(.top, 24)
+                .padding(.bottom, 32)
+            }
+            .scrollDismissesKeyboard(.interactively)
+            .background(DiaryTheme.canvas)
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                saveBar
+            }
+        }
+        .navigationTitle(entryToEdit == nil ? "新しい記録" : "記録を編集")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button("キャンセル", action: requestDismiss)
+            }
+        }
+        .confirmationDialog(
+            "入力を破棄しますか？",
+            isPresented: $showingDiscardConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("入力を破棄", role: .destructive) {
+                onCancel()
+            }
+            Button("続ける", role: .cancel) {}
+        } message: {
+            Text("入力中の内容は保存されません。")
+        }
+        .alert("保存できませんでした", isPresented: $showingSaveError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(saveErrorMessage)
+        }
+    }
+
+    private var recordTypeSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "calendar")
+                    .foregroundStyle(DiaryTheme.muted)
+                Text(formattedDate(entryToEdit?.date ?? Date()))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(DiaryTheme.ink)
+                Spacer()
+                Text(entryToEdit == nil ? "新しい記録" : "記録を編集")
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+
+            Divider()
+
+            sectionTitle("記録の種類", systemImage: "clock")
+
+            HStack(spacing: 10) {
+                recordTypeChoice(
+                    title: "今の気分",
+                    subtitle: "今この瞬間",
+                    systemImage: "sparkles",
+                    value: recordTypes[0]
+                )
+                recordTypeChoice(
+                    title: "今日一日",
+                    subtitle: "一日を振り返る",
+                    systemImage: "sun.max",
+                    value: recordTypes[1]
+                )
+            }
+        }
+        .diaryFormCard()
+    }
+
+    private func recordTypeChoice(
+        title: String,
+        subtitle: String,
+        systemImage: String,
+        value: String
+    ) -> some View {
+        let isSelected = selectedRecordType == value
+
+        return Button {
+            withAnimation(.easeOut(duration: 0.15)) {
+                selectedRecordType = value
+            }
+        } label: {
+            VStack(alignment: .leading, spacing: 6) {
+                Image(systemName: systemImage)
+                    .font(.headline)
+                    .foregroundStyle(isSelected ? DiaryTheme.accent : DiaryTheme.muted)
+                Text(title)
+                    .font(.subheadline.weight(.bold))
+                    .foregroundStyle(DiaryTheme.ink)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(
+                isSelected ? DiaryTheme.accentSoft : Color.clear,
+                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+            )
+            .overlay {
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .stroke(isSelected ? DiaryTheme.accent : DiaryTheme.line, lineWidth: isSelected ? 2 : 1)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(title)・\(subtitle)")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var moodSelectionSection: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .firstTextBaseline) {
+                sectionTitle(
+                    selectedRecordType == "今現在の気分" ? "今の気分は？" : "今日一日の気分は？",
+                    systemImage: "face.smiling"
+                )
+                Spacer()
+                Text("\(selectedMoodScore) / 7")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(spacing: 12) {
+                DiaryLineIcon(
+                    kind: .mood(selectedMoodScore),
+                    color: DiaryTheme.moodColor(for: selectedMoodScore),
+                    size: 42
+                )
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(moodLabels[selectedMoodScore - 1])
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(DiaryTheme.moodColor(for: selectedMoodScore))
+                    Text("スコア \(selectedMoodScore) / 7")
+                        .font(.caption)
+                        .foregroundStyle(DiaryTheme.muted)
+                }
+
+                Spacer()
+            }
+            .padding(.vertical, 4)
+
+            // ドラッグ操作に頼らず、7つの位置を直接クリック／タップできる。
+            HStack(spacing: 5) {
+                ForEach(1...7, id: \.self) { score in
+                    let moodColor = DiaryTheme.moodColor(for: score)
+                    let isSelected = selectedMoodScore == score
+
+                    Button {
+                        withAnimation(.easeOut(duration: 0.15)) {
+                            selectedMoodScore = score
+                        }
+                    } label: {
+                        VStack(spacing: 3) {
+                            DiaryLineIcon(
+                                kind: .mood(score),
+                                color: isSelected ? moodColor : DiaryTheme.muted,
+                                size: 32
+                            )
+                            Text(moodLabels[score - 1])
+                                .font(.caption2.weight(isSelected ? .bold : .regular))
+                                .foregroundStyle(isSelected ? DiaryTheme.ink : DiaryTheme.muted)
+                                .lineLimit(1)
+                        }
+                        .frame(maxWidth: .infinity, minHeight: 72)
+                            .background(
+                                isSelected ? moodColor.opacity(0.12) : Color.clear,
+                                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            )
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(isSelected ? moodColor : DiaryTheme.line, lineWidth: isSelected ? 2 : 1)
+                            }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("\(score) \(moodLabels[score - 1])")
+                    .accessibilityAddTraits(isSelected ? .isSelected : [])
+                }
+            }
+
+            HStack {
+                Text("つらい")
+                Spacer()
+                Text("普通")
+                Spacer()
+                Text("快適")
+            }
+            .font(.caption)
+            .foregroundStyle(DiaryTheme.muted)
+        }
+        .diaryFormCard()
+        .id("mood-selection")
+    }
+
+    private var memoSection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .firstTextBaseline) {
+                sectionTitle("メモ", systemImage: "note.text")
+                Spacer()
+                Text("任意")
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+
+            textEditorField(
+                text: $notes,
+                prompt: "今の気持ちや出来事を、短くても自由に書けます",
+                field: .notes
+            )
+        }
+        .diaryFormCard()
+    }
+
+    private var detailPrompt: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                isShowingDetails = true
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(DiaryTheme.accent)
+
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("詳細を追加する")
+                        .font(.headline)
+                        .foregroundStyle(DiaryTheme.ink)
+                    Text("感情・生活習慣・振り返りなど。入力はすべて任意です")
+                        .font(.caption)
+                        .foregroundStyle(DiaryTheme.muted)
+                }
+
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 14)
+            .overlay(alignment: .bottom) {
+                Divider()
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("任意の詳細入力を表示します")
+    }
+
+    @ViewBuilder
+    private func detailsSection(scrollProxy: ScrollViewProxy) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("詳細入力")
+                        .font(.title3.weight(.bold))
+                    Text("必要な項目だけ開いて記録できます")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Button("閉じる") {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        isShowingDetails = false
+                    }
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DiaryTheme.accent)
+            }
+            .padding(.horizontal, 4)
+
+            detailDisclosure(
+                section: .emotions,
+                title: "今の感情",
+                subtitle: selectedEmotions.isEmpty ? "選択なし" : "\(selectedEmotions.count)個選択",
+                systemImage: "sparkles",
+                color: DiaryTheme.blue
+            ) {
+                tagGrid(options: emotionOptions, selection: $selectedEmotions, color: .blue)
+            }
+
+            detailDisclosure(
+                section: .influences,
+                title: "影響したこと",
+                subtitle: selectedInfluences.isEmpty ? "選択なし" : "\(selectedInfluences.count)個選択",
+                systemImage: "arrow.triangle.2.circlepath",
+                color: DiaryTheme.orange
+            ) {
+                tagGrid(options: influenceOptions, selection: $selectedInfluences, color: .orange)
+            }
+
+            detailDisclosure(
+                section: .lifeFactors,
+                title: "生活習慣",
+                subtitle: selectedLifeFactors.isEmpty ? "選択なし" : "\(selectedLifeFactors.count)個選択",
+                systemImage: "leaf.fill",
+                color: DiaryTheme.green
+            ) {
+                tagGrid(options: lifeFactorOptions, selection: $selectedLifeFactors, color: .green)
+            }
+
+            detailDisclosure(
+                section: .activities,
+                title: "今日したこと",
+                subtitle: activities.isEmpty ? "選択なし" : "\(activities.count)個選択",
+                systemImage: "checkmark.circle",
+                color: DiaryTheme.purple
+            ) {
+                tagGrid(options: activityOptions, selection: $activities, color: .purple)
+            }
+
+            detailDisclosure(
+                section: .gratitude,
+                title: "感謝していること",
+                subtitle: gratitude.isEmpty ? "自由記述" : "入力済み",
+                systemImage: "heart.fill",
+                color: DiaryTheme.accent
+            ) {
+                textEditorField(
+                    text: $gratitude,
+                    prompt: "小さなことでも大丈夫です",
+                    field: .gratitude
+                )
+            }
+
+            detailDisclosure(
+                section: .reflection,
+                title: "今日の振り返り",
+                subtitle: reflections.isEmpty ? "自由記述" : "入力済み",
+                systemImage: "arrow.clockwise",
+                color: DiaryTheme.green
+            ) {
+                textEditorField(
+                    text: $reflections,
+                    prompt: "今日気づいたこと、明日の自分へのメモ",
+                    field: .reflection
+                )
+            }
+        }
+        .id("details")
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                scrollProxy.scrollTo("details", anchor: .top)
+            }
+        }
+    }
+
+    private var saveBar: some View {
+        HStack(spacing: 12) {
+            Spacer(minLength: 0)
+
+            Button(action: saveEntry) {
+                HStack(spacing: 6) {
+                    if isSaving {
+                        ProgressView()
+                            .tint(.white)
+                    } else {
+                        Image(systemName: "checkmark")
+                    }
+                    Text(isSaving ? "保存中" : (entryToEdit == nil ? "保存" : "更新"))
+                }
+                .font(.headline)
+                .foregroundStyle(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 12)
+                .background(DiaryTheme.accent, in: Capsule())
+            }
+            .disabled(isSaving)
+            .accessibilityLabel("日記を保存")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(DiaryTheme.surface)
+        .overlay(alignment: .top) {
+            Divider()
+        }
+    }
+
+    private func detailDisclosure<Content: View>(
+        section: DetailSection,
+        title: String,
+        subtitle: String,
+        systemImage: String,
+        color: Color,
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        DisclosureGroup(isExpanded: expandedBinding(for: section)) {
+            content()
+                .padding(.top, 10)
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .font(.headline)
+                    .foregroundStyle(color)
+                    .frame(width: 28)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .tint(DiaryTheme.muted)
+        .diaryFormCard()
+    }
+
+    private func tagGrid(
+        options: [String],
+        selection: Binding<Set<String>>,
+        color: Color
+    ) -> some View {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 8)], spacing: 8) {
+            ForEach(options, id: \.self) { option in
+                SelectableButton(
+                    label: option,
+                    isSelected: selection.wrappedValue.contains(option),
+                    backgroundColor: color
+                ) {
+                    toggle(option, in: selection)
+                }
+            }
+        }
+    }
+
+    private func textEditorField(
+        text: Binding<String>,
+        prompt: String,
+        field: InputField
+    ) -> some View {
+        ZStack(alignment: .topLeading) {
+            if text.wrappedValue.isEmpty {
+                Text(prompt)
+                    .font(.body)
+                    .foregroundStyle(.tertiary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .allowsHitTesting(false)
+            }
+
+            TextEditor(text: text)
+                .focused($focusedField, equals: field)
+                .scrollContentBackground(.hidden)
+                .frame(minHeight: 112)
+                .padding(10)
+        }
+        .background(DiaryTheme.elevatedSurface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+        }
+    }
+
+    private func sectionTitle(_ title: String, systemImage: String) -> some View {
+        Label(title, systemImage: systemImage)
+            .font(.headline.weight(.bold))
+    }
+
+    private func formattedDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+        formatter.dateFormat = "yyyy年M月d日（E） HH:mm"
+        return formatter.string(from: date)
+    }
+
+    private func expandedBinding(for section: DetailSection) -> Binding<Bool> {
+        Binding(
+            get: { expandedDetails.contains(section) },
+            set: { isExpanded in
+                if isExpanded {
+                    expandedDetails.insert(section)
+                } else {
+                    expandedDetails.remove(section)
+                }
+            }
+        )
+    }
+
+    private func toggle(_ value: String, in selection: Binding<Set<String>>) {
+        var values = selection.wrappedValue
+        if values.contains(value) {
+            values.remove(value)
+        } else {
+            values.insert(value)
+        }
+        selection.wrappedValue = values
+    }
+
+    private var hasChanges: Bool {
+        let trimmedNotes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedGratitude = gratitude.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedReflections = reflections.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard let entryToEdit else {
+            return selectedMoodScore != 4 ||
+                selectedRecordType != recordTypes[0] ||
+                !selectedEmotions.isEmpty ||
+                !selectedInfluences.isEmpty ||
+                !selectedLifeFactors.isEmpty ||
+                !activities.isEmpty ||
+                !trimmedNotes.isEmpty ||
+                !trimmedGratitude.isEmpty ||
+                !trimmedReflections.isEmpty
+        }
+
+        return selectedMoodScore != entryToEdit.moodScore ||
+            selectedRecordType != entryToEdit.recordType ||
+            selectedEmotions.sorted() != entryToEdit.emotions.sorted() ||
+            selectedInfluences.sorted() != entryToEdit.influences.sorted() ||
+            selectedLifeFactors.sorted() != entryToEdit.lifeFactors.sorted() ||
+            activities.sorted() != entryToEdit.activities.sorted() ||
+            trimmedNotes != entryToEdit.notes ||
+            trimmedGratitude != entryToEdit.gratitude ||
+            trimmedReflections != entryToEdit.reflections
+    }
+
+    private func requestDismiss() {
+        focusedField = nil
+        if hasChanges {
+            showingDiscardConfirmation = true
+        } else {
+            onCancel()
+        }
+    }
+
+    private func saveEntry() {
+        guard !isSaving else { return }
+        focusedField = nil
+        isSaving = true
+
+        let entry = entryToEdit ?? MoodEntry()
+        entry.recordType = selectedRecordType
+        entry.mood = moodLabels[selectedMoodScore - 1]
+        entry.moodScore = selectedMoodScore
+        entry.emotions = selectedEmotions.sorted()
+        entry.influences = selectedInfluences.sorted()
+        entry.lifeFactors = selectedLifeFactors.sorted()
+        entry.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
+        entry.activities = activities.sorted()
+        entry.gratitude = gratitude.trimmingCharacters(in: .whitespacesAndNewlines)
+        entry.reflections = reflections.trimmingCharacters(in: .whitespacesAndNewlines)
+        if entryToEdit == nil {
+            entry.date = Date()
+            context.insert(entry)
+        }
+
+        do {
+            try context.save()
+            onSave(entry)
+        } catch {
+            if entryToEdit == nil {
+                context.delete(entry)
+            } else {
+                // 編集途中の変更を保存できなかった場合は、編集前の状態に戻す。
+                context.rollback()
+            }
+            isSaving = false
+            saveErrorMessage = error.localizedDescription
+            showingSaveError = true
+        }
+    }
+}
+
+private enum DetailSection: Hashable {
+    case emotions
+    case influences
+    case lifeFactors
+    case activities
+    case gratitude
+    case reflection
+}
+
+private enum InputField: Hashable {
+    case notes
+    case gratitude
+    case reflection
+}
+
+private extension View {
+    func diaryFormCard() -> some View {
+        self
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 16)
+            .overlay(alignment: .bottom) {
+                Divider()
+            }
+    }
+}

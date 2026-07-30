@@ -1,0 +1,49 @@
+name: Science Club Diary
+
+options:
+  minimumXcodeGenVersion: 2.45.0
+  deploymentTarget:
+    iOS: "18.1"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+targets:
+  Science Club Diary:
+    type: application
+    platform: iOS
+    sources:
+      - path: Diary
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: viuk.scienceclub.diary
+        DEVELOPMENT_TEAM: 34CN68272C
+        GENERATE_INFOPLIST_FILE: true
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_LAUNCH_SCREEN: true
+        INFOPLIST_KEY_CFBundleDisplayName: Science Club Diary
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
+        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
+        INFOPLIST_KEY_UIRequiresFullScreen: false
+        SUPPORTS_MACCATALYST: true
+        # MacではiPad互換版ではなく、Mac Catalyst版を起動する。
+        # iPad実機・iPadシミュレータ向けの対応はTARGETED_DEVICE_FAMILYで維持する。
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false
+        DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER: false
+      configs:
+        Debug:
+          SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+        Release:
+          SWIFT_OPTIMIZATION_LEVEL: "-O"
+
+schemes:
+  Science Club Diary:
+    build:
+      targets:
+        Science Club Diary: all
+    run:
+      config: Debug
+    archive:
+      config: Release

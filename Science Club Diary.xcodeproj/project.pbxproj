@@ -1,0 +1,349 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3602C212FA0CF313F99C3FE /* DiaryApp.swift */; };
+		20CB64F5B4A12278AA6DD7E2 /* NewMoodEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */; };
+		232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */; };
+		2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6284A7417F6F4E775C212446 /* MoodJournalView.swift */; };
+		2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */; };
+		36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DF0CB09392151B28AD6F7 /* MoodEntry.swift */; };
+		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
+		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
+		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
+		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		3115FFDFC83C98AD90565965 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
+		35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryLineIcon.swift; sourceTree = "<group>"; };
+		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
+		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
+		6284A7417F6F4E775C212446 /* MoodJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodJournalView.swift; sourceTree = "<group>"; };
+		736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthAssessment.swift; sourceTree = "<group>"; };
+		787DF0CB09392151B28AD6F7 /* MoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntry.swift; sourceTree = "<group>"; };
+		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
+		9E9F747607977F6DE87AC4BC /* Science Club Diary.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Science Club Diary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoodEntryView.swift; sourceTree = "<group>"; };
+		E3602C212FA0CF313F99C3FE /* DiaryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryApp.swift; sourceTree = "<group>"; };
+		FFB67B6060F19002D6ACE327 /* ArticleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleListView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		80CA678744417BD68760E4D0 /* Diary */ = {
+			isa = PBXGroup;
+			children = (
+				3115FFDFC83C98AD90565965 /* AppInfoView.swift */,
+				FFB67B6060F19002D6ACE327 /* ArticleListView.swift */,
+				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
+				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
+				736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */,
+				5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */,
+				787DF0CB09392151B28AD6F7 /* MoodEntry.swift */,
+				51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */,
+				6284A7417F6F4E775C212446 /* MoodJournalView.swift */,
+				DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */,
+				84991957D3523758A1F8DA62 /* SelectableButton.swift */,
+			);
+			path = Diary;
+			sourceTree = "<group>";
+		};
+		C1C35612FBFB7610EED2EFE0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9E9F747607977F6DE87AC4BC /* Science Club Diary.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E43218F05D60361EBCF0FB22 = {
+			isa = PBXGroup;
+			children = (
+				80CA678744417BD68760E4D0 /* Diary */,
+				C1C35612FBFB7610EED2EFE0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		C010471BE0DE6B3112090CA1 /* Science Club Diary */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9A8E634D38B68AAFFCAB2FC /* Build configuration list for PBXNativeTarget "Science Club Diary" */;
+			buildPhases = (
+				6278F39CE478D76E5530B0BF /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Science Club Diary";
+			packageProductDependencies = (
+			);
+			productName = "Science Club Diary";
+			productReference = 9E9F747607977F6DE87AC4BC /* Science Club Diary.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		6752128DC9EEE499D866A243 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					C010471BE0DE6B3112090CA1 = {
+						DevelopmentTeam = 34CN68272C;
+					};
+				};
+			};
+			buildConfigurationList = 32BA916CF741901EEBAD698B /* Build configuration list for PBXProject "Science Club Diary" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = E43218F05D60361EBCF0FB22;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = C1C35612FBFB7610EED2EFE0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C010471BE0DE6B3112090CA1 /* Science Club Diary */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		6278F39CE478D76E5530B0BF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */,
+				689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */,
+				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
+				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
+				2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */,
+				FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */,
+				36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */,
+				562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */,
+				2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */,
+				20CB64F5B4A12278AA6DD7E2 /* NewMoodEntryView.swift in Sources */,
+				80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		18EC6CCFC5EA2956FD59AB5A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		3CD3E4F25E6EF1E8F1D851F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
+				DEVELOPMENT_TEAM = 34CN68272C;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Science Club Diary";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = viuk.scienceclub.diary;
+				SDKROOT = iphoneos;
+				SUPPORTS_LAUNCH_SCREEN = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		6CA4B2A4C4F6FCA9DADC8022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
+				DEVELOPMENT_TEAM = 34CN68272C;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Science Club Diary";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIRequiresFullScreen = NO;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = viuk.scienceclub.diary;
+				SDKROOT = iphoneos;
+				SUPPORTS_LAUNCH_SCREEN = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BC0D62F90BC8525BEA842772 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		32BA916CF741901EEBAD698B /* Build configuration list for PBXProject "Science Club Diary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				18EC6CCFC5EA2956FD59AB5A /* Debug */,
+				BC0D62F90BC8525BEA842772 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B9A8E634D38B68AAFFCAB2FC /* Build configuration list for PBXNativeTarget "Science Club Diary" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3CD3E4F25E6EF1E8F1D851F3 /* Debug */,
+				6CA4B2A4C4F6FCA9DADC8022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 6752128DC9EEE499D866A243 /* Project object */;
+}
