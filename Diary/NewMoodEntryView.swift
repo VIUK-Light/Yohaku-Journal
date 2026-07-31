@@ -23,6 +23,8 @@ struct NewMoodEntryView: View {
     @State private var showingDiscardConfirmation = false
     @State private var showingSaveError = false
     @State private var saveErrorMessage = ""
+    @State private var showingAdditionalEvents = false
+    @State private var customEventTag = ""
     @State private var isSaving = false
     @FocusState private var focusedField: InputField?
 
@@ -50,7 +52,6 @@ struct NewMoodEntryView: View {
         _reflections = State(initialValue: entryToEdit?.reflections ?? "")
         _isShowingDetails = State(initialValue: entryToEdit.map { entry in
             !entry.emotions.isEmpty ||
-            !entry.influences.isEmpty ||
             !entry.lifeFactors.isEmpty ||
             !entry.activities.isEmpty ||
             !entry.gratitude.isEmpty ||
@@ -66,10 +67,24 @@ struct NewMoodEntryView: View {
         "不安", "ストレス", "悲しみ", "怒り", "不満", "疲労", "孤独", "混乱"
     ]
 
-    private let influenceOptions = [
+    private let eventOptions = [
         "タスク", "健康", "友達", "家族", "天気", "仕事", "学校", "お金",
         "恋愛", "趣味", "ニュース", "音楽", "食事", "休息"
     ]
+
+    private var primaryEventOptions: [String] {
+        Array(eventOptions.prefix(6))
+    }
+
+    private var additionalEventOptions: [String] {
+        Array(eventOptions.dropFirst(6))
+    }
+
+    private var customEventTags: [String] {
+        selectedInfluences
+            .filter { !eventOptions.contains($0) }
+            .sorted()
+    }
 
     private let lifeFactorOptions = ["睡眠", "運動", "日光", "食事", "水分", "瞑想", "読書", "散歩"]
     private let activityOptions = ["勉強", "実験", "運動", "読書", "友人との時間", "家族との時間", "趣味", "休息"]
@@ -80,6 +95,7 @@ struct NewMoodEntryView: View {
                 VStack(spacing: 16) {
                     recordTypeSection
                     moodSelectionSection
+                    eventSection
                     memoSection
 
                     if isShowingDetails {
@@ -219,7 +235,7 @@ struct NewMoodEntryView: View {
                 DiaryLineIcon(
                     kind: .mood(selectedMoodScore),
                     color: DiaryTheme.moodColor(for: selectedMoodScore),
-                    size: 42
+                    size: 48
                 )
 
                 VStack(alignment: .leading, spacing: 3) {
@@ -235,53 +251,7 @@ struct NewMoodEntryView: View {
             }
             .padding(.vertical, 4)
 
-            // ドラッグ操作に頼らず、7つの位置を直接クリック／タップできる。
-            HStack(spacing: 5) {
-                ForEach(1...7, id: \.self) { score in
-                    let moodColor = DiaryTheme.moodColor(for: score)
-                    let isSelected = selectedMoodScore == score
-
-                    Button {
-                        withAnimation(.easeOut(duration: 0.15)) {
-                            selectedMoodScore = score
-                        }
-                    } label: {
-                        VStack(spacing: 3) {
-                            DiaryLineIcon(
-                                kind: .mood(score),
-                                color: isSelected ? moodColor : DiaryTheme.muted,
-                                size: 32
-                            )
-                            Text(moodLabels[score - 1])
-                                .font(.caption2.weight(isSelected ? .bold : .regular))
-                                .foregroundStyle(isSelected ? DiaryTheme.ink : DiaryTheme.muted)
-                                .lineLimit(1)
-                        }
-                        .frame(maxWidth: .infinity, minHeight: 72)
-                            .background(
-                                isSelected ? moodColor.opacity(0.12) : Color.clear,
-                                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            )
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(isSelected ? moodColor : DiaryTheme.line, lineWidth: isSelected ? 2 : 1)
-                            }
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("\(score) \(moodLabels[score - 1])")
-                    .accessibilityAddTraits(isSelected ? .isSelected : [])
-                }
-            }
-
-            HStack {
-                Text("つらい")
-                Spacer()
-                Text("普通")
-                Spacer()
-                Text("快適")
-            }
-            .font(.caption)
-            .foregroundStyle(DiaryTheme.muted)
+            MoodInputRail(score: $selectedMoodScore, labels: moodLabels)
         }
         .diaryFormCard()
         .id("mood-selection")
@@ -306,6 +276,117 @@ struct NewMoodEntryView: View {
         .diaryFormCard()
     }
 
+    private var eventSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                sectionTitle("今日、何があった？", systemImage: "circle.grid.2x2")
+                Spacer()
+                Text(selectedInfluences.isEmpty ? "任意" : "\(selectedInfluences.count)個")
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+
+            Text("出来事のタグは、あとで気分の変化と比べるために使います。")
+                .font(.caption)
+                .foregroundStyle(DiaryTheme.muted)
+                .fixedSize(horizontal: false, vertical: true)
+
+            tagGrid(options: primaryEventOptions, selection: $selectedInfluences, color: DiaryTheme.orange)
+
+            Button {
+                showingAdditionalEvents = true
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "ellipsis.circle")
+                    Text("その他の出来事")
+                    Spacer()
+                    if !additionalEventOptions.filter(selectedInfluences.contains).isEmpty || !customEventTags.isEmpty {
+                        Text("追加済み")
+                            .font(.caption)
+                            .foregroundStyle(DiaryTheme.orange)
+                    }
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.bold))
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(DiaryTheme.ink)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.top, 4)
+            }
+            .buttonStyle(.plain)
+        }
+        .diaryFormCard()
+        .sheet(isPresented: $showingAdditionalEvents) {
+            additionalEventsSheet
+        }
+    }
+
+    private var additionalEventsSheet: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("既存のタグ")
+                            .font(.headline)
+                        tagGrid(
+                            options: additionalEventOptions,
+                            selection: $selectedInfluences,
+                            color: DiaryTheme.orange
+                        )
+                    }
+
+                    if !customEventTags.isEmpty {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("追加したタグ")
+                                .font(.headline)
+                            tagGrid(
+                                options: customEventTags,
+                                selection: $selectedInfluences,
+                                color: DiaryTheme.accent
+                            )
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("自由タグを追加")
+                            .font(.headline)
+
+                        HStack(spacing: 8) {
+                            TextField("例：通院、発表、移動", text: $customEventTag)
+                                .textFieldStyle(.roundedBorder)
+                                .onSubmit(addCustomEventTag)
+
+                            Button("追加", action: addCustomEventTag)
+                                .buttonStyle(.borderedProminent)
+                                .tint(DiaryTheme.accent)
+                                .disabled(customEventTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                        }
+                    }
+                }
+                .padding(20)
+            }
+            .background(DiaryTheme.canvas)
+            .navigationTitle("その他の出来事")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("完了") {
+                        showingAdditionalEvents = false
+                    }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+
+    private func addCustomEventTag() {
+        let value = customEventTag.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !value.isEmpty else { return }
+
+        selectedInfluences.insert(value)
+        customEventTag = ""
+    }
+
     private var detailPrompt: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.2)) {
@@ -321,7 +402,7 @@ struct NewMoodEntryView: View {
                     Text("詳細を追加する")
                         .font(.headline)
                         .foregroundStyle(DiaryTheme.ink)
-                    Text("感情・生活習慣・振り返りなど。入力はすべて任意です")
+                    Text("感情・生活習慣・活動・振り返りなど。入力はすべて任意です")
                         .font(.caption)
                         .foregroundStyle(DiaryTheme.muted)
                 }
@@ -371,16 +452,6 @@ struct NewMoodEntryView: View {
                 color: DiaryTheme.blue
             ) {
                 tagGrid(options: emotionOptions, selection: $selectedEmotions, color: .blue)
-            }
-
-            detailDisclosure(
-                section: .influences,
-                title: "影響したこと",
-                subtitle: selectedInfluences.isEmpty ? "選択なし" : "\(selectedInfluences.count)個選択",
-                systemImage: "arrow.triangle.2.circlepath",
-                color: DiaryTheme.orange
-            ) {
-                tagGrid(options: influenceOptions, selection: $selectedInfluences, color: .orange)
             }
 
             detailDisclosure(
@@ -659,9 +730,67 @@ struct NewMoodEntryView: View {
     }
 }
 
+private struct MoodInputRail: View {
+    @Binding var score: Int
+    let labels: [String]
+
+    var body: some View {
+        VStack(spacing: 7) {
+            GeometryReader { geometry in
+                ZStack {
+                    Capsule()
+                        .fill(DiaryTheme.line)
+                        .frame(height: 4)
+                        .padding(.horizontal, 24)
+
+                    HStack(spacing: 0) {
+                        ForEach(1...7, id: \.self) { value in
+                            let isSelected = score == value
+                            let moodColor = DiaryTheme.moodColor(for: value)
+
+                            Button {
+                                withAnimation(.easeOut(duration: 0.15)) {
+                                    score = value
+                                }
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .fill(isSelected ? moodColor.opacity(0.14) : Color.clear)
+                                        .frame(width: 48, height: 48)
+
+                                    DiaryLineIcon(
+                                        kind: .mood(value),
+                                        color: isSelected ? moodColor : DiaryTheme.muted,
+                                        size: isSelected ? 38 : 28
+                                    )
+                                }
+                                .frame(maxWidth: .infinity, minHeight: 56)
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel("\(value) \(labels[value - 1])")
+                            .accessibilityAddTraits(isSelected ? .isSelected : [])
+                        }
+                    }
+                }
+                .frame(width: geometry.size.width, height: 64)
+            }
+            .frame(height: 64)
+
+            HStack {
+                Text("つらい")
+                Spacer()
+                Text("普通")
+                Spacer()
+                Text("快適")
+            }
+            .font(.caption)
+            .foregroundStyle(DiaryTheme.muted)
+        }
+    }
+}
+
 private enum DetailSection: Hashable {
     case emotions
-    case influences
     case lifeFactors
     case activities
     case gratitude

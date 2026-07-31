@@ -119,7 +119,7 @@ struct MoodEntryDetailView: View {
                 tagGroup(title: "感情", tags: entry.emotions, color: .blue)
             }
             if !entry.influences.isEmpty {
-                tagGroup(title: "影響したこと", tags: entry.influences, color: .orange)
+                tagGroup(title: "出来事", tags: entry.influences, color: .orange)
             }
             if !entry.lifeFactors.isEmpty {
                 tagGroup(title: "生活習慣", tags: entry.lifeFactors, color: .green)
