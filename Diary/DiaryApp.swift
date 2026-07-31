@@ -27,9 +27,11 @@ enum DiaryTheme {
     static let muted = Color(uiColor: .secondaryLabel)
     static let line = Color(uiColor: .separator).opacity(0.55)
 
-    // 主操作は1色に揃え、ボタンの意味を迷わせない。
-    static let accent = Color(red: 0.80, green: 0.29, blue: 0.30)
-    static let accentSoft = accent.opacity(0.13)
+    // 通常操作は温かいオレンジに揃える。赤は緊急案内・削除だけに使う。
+    static let primary = Color(red: 0.76, green: 0.42, blue: 0.15)
+    static let accent = primary
+    static let accentSoft = primary.opacity(0.13)
+    static let emergency = Color(red: 0.69, green: 0.22, blue: 0.22)
 
     static let blue = Color(red: 0.29, green: 0.40, blue: 0.68)
     static let green = Color(red: 0.29, green: 0.49, blue: 0.38)
