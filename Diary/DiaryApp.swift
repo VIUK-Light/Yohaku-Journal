@@ -93,7 +93,7 @@ struct ScienceClubDiaryApp: App {
                 .background(MacWindowConfigurator())
 #endif
         }
-        .modelContainer(for: [MoodEntry.self, MentalHealthAssessment.self])
+        .modelContainer(for: [MoodEntry.self, MentalHealthAssessment.self, LightSafetyCheckRecord.self])
 #if targetEnvironment(macCatalyst)
         // Macでは縦長のiPhone画面にならないよう、横長の初期ウィンドウを指定する。
         .defaultSize(width: 1180, height: 760)

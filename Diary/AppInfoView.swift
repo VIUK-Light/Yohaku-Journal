@@ -1,9 +1,15 @@
 import SwiftUI
+import SwiftData
 
 /// アプリの理念、保存方法、安全性、相談先を短く確認できる画面。
 /// 機能をもう一度並べるのではなく、必要な説明だけを置く。
 struct AppInfoView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @Query(sort: [SortDescriptor(\LightSafetyCheckRecord.date, order: .reverse)])
+    private var safetyRecords: [LightSafetyCheckRecord]
+    @State private var showingSafetyRecordDeletion = false
+    @State private var showingSafetyRecordError = false
 
     var body: some View {
         NavigationStack {
@@ -12,6 +18,7 @@ struct AppInfoView: View {
                 missionSection
                 toolsSection
                 safetySection
+                safetyRecordSection
                 supportSection
             }
             .listStyle(.insetGrouped)
@@ -110,14 +117,89 @@ struct AppInfoView: View {
             SupportLink(
                 title: "こころの健康相談統一ダイヤル",
                 subtitle: "0570-064-556",
-                description: "地域の公的な心の健康相談窓口につながります。"
+                description: "地域の公的な心の健康相談窓口につながります。",
+                destination: URL(string: "tel:0570064556")!
             )
 
             SupportLink(
                 title: "よりそいホットライン",
                 subtitle: "0120-279-338",
-                description: "さまざまな悩みを相談できる窓口です。"
+                description: "さまざまな悩みを相談できる窓口です。",
+                destination: URL(string: "tel:0120279338")!
             )
+
+            Link("厚生労働省の相談先一覧を見る", destination: URL(string: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/")!)
+                .font(.subheadline.weight(.semibold))
+        }
+    }
+
+    private var safetyRecordSection: some View {
+        Section("安全確認の記録") {
+            if safetyRecords.isEmpty {
+                Text("安全確認の記録はありません。")
+                    .foregroundStyle(DiaryTheme.muted)
+            } else {
+                Text("保存した場合も、確認を行った日時だけが端末に残ります。回答内容や日記本文は含まれません。")
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+
+                ForEach(safetyRecords) { record in
+                    HStack {
+                        Label("安全確認を実施", systemImage: "checkmark.shield")
+                        Spacer()
+                        Text(record.date, format: .dateTime.year().month().day())
+                            .font(.caption)
+                            .foregroundStyle(DiaryTheme.muted)
+                    }
+                    .swipeActions {
+                        Button("削除", role: .destructive) {
+                            deleteSafetyRecord(record)
+                        }
+                    }
+                }
+
+                Button("安全確認の記録をすべて削除", role: .destructive) {
+                    showingSafetyRecordDeletion = true
+                }
+            }
+        }
+        .confirmationDialog(
+            "安全確認の記録を削除しますか？",
+            isPresented: $showingSafetyRecordDeletion,
+            titleVisibility: .visible
+        ) {
+            Button("すべて削除", role: .destructive) {
+                deleteAllSafetyRecords()
+            }
+            Button("キャンセル", role: .cancel) {}
+        } message: {
+            Text("削除するのは確認日時だけです。日記や既存のセルフチェック記録には影響しません。")
+        }
+        .alert("削除できませんでした", isPresented: $showingSafetyRecordError) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("安全確認の記録は変更されていません。")
+        }
+    }
+
+    private func deleteSafetyRecord(_ record: LightSafetyCheckRecord) {
+        modelContext.delete(record)
+        saveSafetyRecordChanges()
+    }
+
+    private func deleteAllSafetyRecords() {
+        for record in safetyRecords {
+            modelContext.delete(record)
+        }
+        saveSafetyRecordChanges()
+    }
+
+    private func saveSafetyRecordChanges() {
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            showingSafetyRecordError = true
         }
     }
 }
@@ -167,20 +249,23 @@ private struct SupportLink: View {
     let title: String
     let subtitle: String
     let description: String
+    let destination: URL
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(DiaryTheme.accent)
+        Link(destination: destination) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
 
-            Text(subtitle)
-                .font(.headline.monospacedDigit())
+                Text(subtitle)
+                    .font(.headline.monospacedDigit())
 
-            Text(description)
-                .font(.caption)
-                .foregroundStyle(DiaryTheme.muted)
+                Text(description)
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 3)
         }
-        .padding(.vertical, 3)
     }
 }

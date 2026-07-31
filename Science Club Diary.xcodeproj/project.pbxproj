@@ -17,6 +17,7 @@
 		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
 		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		8A1B0C7D4E2F6A8B9C0D1E2F /* LightSafetyCheckRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B2C1D0E9F8A7B6C5D4E3F2A /* LightSafetyCheckRecord.swift */; };
 		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
 /* End PBXBuildFile section */
 
@@ -26,6 +27,7 @@
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
 		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
 		6284A7417F6F4E775C212446 /* MoodJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodJournalView.swift; sourceTree = "<group>"; };
+		7B2C1D0E9F8A7B6C5D4E3F2A /* LightSafetyCheckRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSafetyCheckRecord.swift; sourceTree = "<group>"; };
 		736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthAssessment.swift; sourceTree = "<group>"; };
 		787DF0CB09392151B28AD6F7 /* MoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntry.swift; sourceTree = "<group>"; };
 		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
@@ -43,6 +45,7 @@
 				FFB67B6060F19002D6ACE327 /* ArticleListView.swift */,
 				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
 				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
+				7B2C1D0E9F8A7B6C5D4E3F2A /* LightSafetyCheckRecord.swift */,
 				736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */,
 				5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */,
 				787DF0CB09392151B28AD6F7 /* MoodEntry.swift */,
@@ -132,6 +135,7 @@
 				689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */,
 				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
 				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
+				8A1B0C7D4E2F6A8B9C0D1E2F /* LightSafetyCheckRecord.swift in Sources */,
 				2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */,
 				FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */,
 				36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */,

@@ -28,6 +28,21 @@ struct MentalHealthCheckView: View {
     @State private var stressCheckAnswers: [Int] = Array(repeating: -1, count: 20)
     // 自由記述のメモを保持する状態変数
     @State private var notes = ""
+    // セルフチェック開始前の安全確認。回答内容は保存しない。
+    @State private var safetyGateCompleted = false
+    @State private var safetyResponse: SafetyResponse?
+    @State private var saveSafetyCheck = false
+    @State private var showingSupportResources = false
+    @State private var safetySaveError = false
+    @State private var assessmentSaveError = false
+
+    private enum SafetyResponse: String, CaseIterable, Identifiable {
+        case notNow = "今はない"
+        case unsure = "少しある／よくわからない"
+        case present = "ある"
+
+        var id: String { rawValue }
+    }
     
     // 診断テストの種類を定義する列挙型
     enum TestType: String, CaseIterable {
@@ -35,10 +50,10 @@ struct MentalHealthCheckView: View {
         case gad7 = "GAD-7"
         case k6 = "K6"
         case k10 = "K10"
-        case mutualLove = "両思い診断"
-        case romanticSign = "脈あり診断"
-        case smartphoneBrain = "スマホ脳チェック"
-        case stressCheck = "ストレスチェック"
+        case mutualLove = "関係性を振り返る"
+        case romanticSign = "やりとりを振り返る"
+        case smartphoneBrain = "スマホとの付き合い方を振り返る"
+        case stressCheck = "職場向けストレスチェック（停止中）"
         
         // テストの表示名（ローカライズ対応）
         var displayName: String {
@@ -47,25 +62,36 @@ struct MentalHealthCheckView: View {
             case .gad7: return "不安症状チェック（GAD-7）"
             case .k6: return "心理的苦痛チェック（K6）"
             case .k10: return "心理的苦痛チェック（K10）"
-            case .mutualLove: return "両思い診断"
-            case .romanticSign: return "脈あり診断"
-            case .smartphoneBrain: return "スマホ脳チェック"
-            case .stressCheck: return "ストレスチェック"
+            case .mutualLove: return "関係性を振り返る"
+            case .romanticSign: return "やりとりを振り返る"
+            case .smartphoneBrain: return "スマホとの付き合い方を振り返る"
+            case .stressCheck: return "職場向けストレスチェック（停止中）"
             }
         }
         
         // テストの説明文
         var description: String {
             switch self {
-            case .phq9: return "気分の落ち込みや興味の喪失などの抑うつ症状を評価します（9問・約3分）"
-            case .gad7: return "不安や心配、緊張などの不安症状を評価します（7問・約2分）"
-            case .k6: return "心理的な苦痛やストレスの程度を簡潔に評価します（6問・約2分）"
-            case .k10: return "心理的な苦痛やストレスの程度を詳細に評価します（10問・約3分）"
-            case .mutualLove: return "お互いの気持ちや関係性を総合的に分析します（10問・約3分）"
-            case .romanticSign: return "相手からの好意のサインを客観的に評価します（10問・約3分）"
-            case .smartphoneBrain: return "スマートフォン使用が脳に与える影響を評価します（12問・約4分）"
-            case .stressCheck: return "職場や日常生活のストレス状況を総合的に評価します（20問・約5分）"
+            case .phq9: return "標準化された質問票のため、現在は新規実行を停止しています。"
+            case .gad7: return "標準化された質問票のため、現在は新規実行を停止しています。"
+            case .k6: return "標準化された質問票のため、現在は新規実行を停止しています。"
+            case .k10: return "標準化された質問票のため、現在は新規実行を停止しています。"
+            case .mutualLove: return "相手の気持ちを決めつけず、自分が感じた出来事を振り返ります（10問）"
+            case .romanticSign: return "やりとりの中で自分が気づいたことを振り返ります（10問）"
+            case .smartphoneBrain: return "使った場面や、その後の自分の感覚を振り返ります（12問）"
+            case .stressCheck: return "職場向けの標準化チェックのため、現在は新規実行を停止しています。"
             }
+        }
+
+        var isPaused: Bool {
+            switch self {
+            case .phq9, .gad7, .k6, .k10, .stressCheck: return true
+            case .mutualLove, .romanticSign, .smartphoneBrain: return false
+            }
+        }
+
+        var pauseReason: String? {
+            isPaused ? "中高生を主対象とする現在の設計では、標準化された判定を一時停止しています。" : nil
         }
         
         // テストに関連付けられた色
@@ -247,49 +273,142 @@ struct MentalHealthCheckView: View {
     
     // ビューの本体
     var body: some View {
-        // ナビゲーションスタックで画面遷移を管理
         NavigationStack {
-            // メインの垂直スタック
-            VStack {
-                // PHQ-9, GAD-7, K6, K10, ストレスチェックのいずれかが選択されている場合に免責事項を表示
-                if selectedTests.contains(.phq9) || selectedTests.contains(.gad7) ||
-                   selectedTests.contains(.k6) || selectedTests.contains(.k10) ||
-                   selectedTests.contains(.stressCheck) {
-                    DisclaimerView() // 免責事項を表示するカスタムビュー
-                }
-                
-                // 現在のステップ（画面の状態）に応じて表示するビューを切り替える
-                switch currentStep {
-                case 0:
-                    testSelectionView // テスト選択画面を表示
-                case 1:
-                    assessmentView // 評価（質問）画面を表示
-                case 2:
-                    resultView // 結果表示画面を表示
-                default:
-                    testSelectionView // デフォルトはテスト選択画面
+            Group {
+                if safetyGateCompleted {
+                    switch currentStep {
+                    case 0: testSelectionView
+                    case 1: assessmentView
+                    case 2: resultView
+                    default: testSelectionView
+                    }
+                } else {
+                    safetyGateView
                 }
             }
-            .navigationTitle("心理・恋愛・デジタル診断") // ナビゲーションバーのタイトル
-            .navigationBarTitleDisplayMode(.inline) // タイトルをインライン（中央揃え）で表示
-            .toolbar { // ナビゲーションバーのツールバー設定
-                // 左側のツールバーアイテム
+            .navigationTitle("セルフチェック")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Button("閉じる") { // 閉じるボタン
+                    Button("閉じる") {
                         dismiss() // 現在のビューを閉じる
                     }
                 }
-                
-                // 現在のステップが0より大きい場合（テスト選択画面以外の場合）、戻るボタンを表示
-                if currentStep > 0 {
+                if safetyGateCompleted && currentStep > 0 {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button("戻る") { // 戻るボタン
+                        Button("戻る") {
                             goBack() // 前のステップまたは前のテストに戻る処理を実行
                         }
                     }
                 }
             }
+            .alert("保存できませんでした", isPresented: $assessmentSaveError) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("回答内容は画面に残っています。空き容量や端末の状態を確認して、もう一度保存できます。")
+            }
         }
+    }
+
+    private var safetyGateView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Label("始める前に、安全確認", systemImage: "checkmark.shield")
+                    .font(.title2.weight(.semibold))
+
+                Text("答えたくない場合は、ここで閉じても大丈夫です。回答内容は保存しません。")
+                    .foregroundStyle(.secondary)
+
+                Text("今、自分を傷つけたい気持ちや、消えてしまいたい気持ちはありますか？")
+                    .font(.headline)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(spacing: 10) {
+                    ForEach(SafetyResponse.allCases) { response in
+                        Button {
+                            safetyResponse = response
+                            showingSupportResources = response != .notNow
+                        } label: {
+                            HStack {
+                                Text(response.rawValue)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Image(systemName: safetyResponse == response ? "checkmark.circle.fill" : "circle")
+                            }
+                            .font(.body.weight(.medium))
+                            .padding()
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.bordered)
+                        .tint(safetyResponse == response ? DiaryTheme.accent : .secondary)
+                        .accessibilityAddTraits(safetyResponse == response ? .isSelected : [])
+                    }
+                }
+
+                if safetyResponse == .unsure || safetyResponse == .present {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("今すぐひとりで抱えなくて大丈夫です。家族・先生・保健室・信頼できる大人に声をかけることも選べます。")
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Button(showingSupportResources ? "相談先を閉じる" : "相談先を見る") {
+                            showingSupportResources.toggle()
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        if showingSupportResources {
+                            ConsultationResourcesView()
+                        }
+                    }
+                    .padding()
+                    .background(DiaryTheme.accentSoft, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+
+                Toggle("安全確認を行ったことだけを端末に保存する（回答内容は保存しません）", isOn: $saveSafetyCheck)
+                    .font(.subheadline)
+
+                if safetySaveError {
+                    Text("端末への保存に失敗しました。回答内容は保存されていません。保存せずに続けることはできます。")
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                }
+
+                VStack(spacing: 10) {
+                    Button("続ける") {
+                        completeSafetyGate()
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .frame(maxWidth: .infinity)
+                    .disabled(safetyResponse == nil)
+
+                    Button("いったん閉じる") {
+                        dismiss()
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .padding()
+            .frame(maxWidth: 620)
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func completeSafetyGate() {
+        guard safetyResponse != nil else { return }
+        safetySaveError = false
+
+        if saveSafetyCheck {
+            let record = LightSafetyCheckRecord()
+            context.insert(record)
+            do {
+                try context.save()
+            } catch {
+                context.delete(record)
+                safetySaveError = true
+                return
+            }
+        }
+
+        safetyGateCompleted = true
     }
     
     // テスト選択画面のビュー（ScrollViewでスクロール可能）
@@ -300,10 +419,10 @@ struct MentalHealthCheckView: View {
             VStack(spacing: 24) {
                 // タイトルとサブタイトル
                 VStack(spacing: 12) {
-                    Text("診断したい項目を選択してください")
+                    Text("振り返りたいものを選択してください")
                         .font(.title2.bold()) // タイトルを太字、大きめのフォントで表示
                     
-                    Text("心の健康、恋愛、デジタル健康、ストレスから選択できます")
+                    Text("結果で決めつけず、自分の気づきを整理するために使えます")
                         .font(.subheadline) // サブタイトルを少し小さめのフォントで表示
                         .foregroundColor(.secondary) // 色を二次色（グレー系）に設定
                 }
@@ -317,7 +436,7 @@ struct MentalHealthCheckView: View {
                                   color: .blue)
                     
                     // 恋愛診断カテゴリのセクション
-                    categorySection(title: "恋愛診断",
+                    categorySection(title: "関係性の振り返り",
                                   tests: [.mutualLove, .romanticSign],
                                   icon: "heart.fill",
                                   color: .pink)
@@ -350,7 +469,7 @@ struct MentalHealthCheckView: View {
                 }
                 
                 // テスト開始ボタン
-                Button("選択したテストを開始") {
+                Button("選択した振り返りを開始") {
                     startSelectedTests() // テスト開始処理を呼び出す
                 }
                 .font(.headline) // 見出しフォント
@@ -392,6 +511,9 @@ struct MentalHealthCheckView: View {
                         isSelected: selectedTests.contains(testType) // 選択されているかどうかの状態
                     ) {
                         // タップ時のアクション（テストの選択/解除）
+                        if testType.isPaused {
+                            return
+                        }
                         if selectedTests.contains(testType) {
                             selectedTests.remove(testType) // 選択解除
                         } else {
@@ -490,7 +612,7 @@ struct MentalHealthCheckView: View {
         ScrollView { // 結果表示もスクロール可能にする
             // 結果表示コンテンツの垂直スタック
             VStack(spacing: 24) {
-                Text("診断結果") // 結果画面のタイトル
+                Text("振り返りの記録") // 結果画面のタイトル
                     .font(.largeTitle.bold()) // 大きく太字で表示
                 
                 // 選択されたテストに基づいて、対応する結果カードを表示
@@ -536,7 +658,7 @@ struct MentalHealthCheckView: View {
                 
                 if selectedTests.contains(.mutualLove) {
                     LoveResultCard( // 恋愛結果カード
-                        title: "両思い診断",
+                        title: "関係性を振り返る",
                         score: mutualLoveScore,
                         maxScore: 40,
                         interpretation: mutualLoveInterpretation,
@@ -547,7 +669,7 @@ struct MentalHealthCheckView: View {
                 
                 if selectedTests.contains(.romanticSign) {
                     LoveResultCard(
-                        title: "脈あり診断",
+                        title: "やりとりを振り返る",
                         score: romanticSignScore,
                         maxScore: 40,
                         interpretation: romanticSignInterpretation,
@@ -558,7 +680,7 @@ struct MentalHealthCheckView: View {
                 
                 if selectedTests.contains(.smartphoneBrain) {
                     DigitalHealthResultCard( // デジタル健康結果カード
-                        title: "スマホ脳チェック",
+                        title: "スマホとの付き合い方を振り返る",
                         score: smartphoneBrainScore,
                         maxScore: 48,
                         interpretation: smartphoneBrainInterpretation,
@@ -845,89 +967,65 @@ struct MentalHealthCheckView: View {
     // 両思い診断スコアに基づいた解釈結果を返す計算プロパティ
     private var mutualLoveInterpretation: String {
         switch mutualLoveScore {
-        case 0...10: return "友情関係" // 0-10点: 友情関係
-        case 11...20: return "好意的関係" // 11-20点: 好意的関係
-        case 21...30: return "恋愛関係" // 21-30点: 恋愛関係
-        case 31...40: return "両思い" // 31-40点: 両思い
-        default: return "測定不能" // それ以外: 測定不能
+        case 0...10: return "気づきは少なめ"
+        case 11...20: return "いくつか気づきあり"
+        case 21...30: return "関係を振り返る材料あり"
+        case 31...40: return "多くの気づきあり"
+        default: return "記録を確認"
         }
     }
     
     // 脈あり診断スコアに基づいた解釈結果を返す計算プロパティ
     private var romanticSignInterpretation: String {
         switch romanticSignScore {
-        case 0...10: return "脈なし" // 0-10点: 脈なし
-        case 11...20: return "友達レベル" // 11-20点: 友達レベル
-        case 21...30: return "好意あり" // 21-30点: 好意あり
-        case 31...40: return "脈あり" // 31-40点: 脈あり
-        default: return "測定不能" // それ以外: 測定不能
+        case 0...10: return "気づきは少なめ"
+        case 11...20: return "いくつか気づきあり"
+        case 21...30: return "やりとりを振り返る材料あり"
+        case 31...40: return "多くの気づきあり"
+        default: return "記録を確認"
         }
     }
     
     // スマホ脳チェックスコアに基づいた解釈結果を返す計算プロパティ
     private var smartphoneBrainInterpretation: String {
         switch smartphoneBrainScore {
-        case 0...12: return "健康的" // 0-12点: 健康的
-        case 13...24: return "軽度の影響" // 13-24点: 軽度の影響
-        case 25...36: return "中等度の影響" // 25-36点: 中等度の影響
-        case 37...48: return "重度の影響" // 37-48点: 重度の影響
-        default: return "測定不能" // それ以外: 測定不能
+        case 0...12: return "気づきは少なめ"
+        case 13...24: return "いくつか気づきあり"
+        case 25...36: return "使い方を見直す材料あり"
+        case 37...48: return "生活との関わりを振り返る材料あり"
+        default: return "記録を確認"
         }
     }
     
     // ストレスチェックスコアに基づいた解釈結果を返す計算プロパティ
     private var stressCheckInterpretation: String {
         switch stressCheckScore {
-        case 0...20: return "低ストレス" // 0-20点: 低ストレス
-        case 21...40: return "軽度ストレス" // 21-40点: 軽度ストレス
-        case 41...60: return "中等度ストレス" // 41-60点: 中等度ストレス
-        case 61...80: return "高ストレス" // 61-80点: 高ストレス
-        default: return "測定不能" // それ以外: 測定不能
+        case 0...20: return "気づきは少なめ"
+        case 21...40: return "いくつか気づきあり"
+        case 41...60: return "負担を振り返る材料あり"
+        case 61...80: return "相談や休息を考える材料あり"
+        default: return "記録を確認"
         }
     }
     
     // 両思い診断スコアに基づいた詳細な説明文を返す計算プロパティ
     private var mutualLoveDescription: String {
-        switch mutualLoveScore {
-        case 0...10: return "現在は友情関係のようです。お互いを大切な友達として関係を築いていくことが大切です。"
-        case 11...20: return "お互いに好意を持っている関係のようです。時間をかけて関係を深めていくことで、より特別な関係になるかもしれません。"
-        case 21...30: return "恋愛関係として成長している段階のようです。お互いの気持ちを確かめ合いながら関係を大切にしていきましょう。"
-        case 31...40: return "両思いの関係のようです。お互いを大切に思い合う素晴らしい関係を築いていてください。"
-        default: return "" // スコアが範囲外の場合、空文字列を返す
-        }
+        "この結果は相手の気持ちや関係の答えではありません。自分が見た出来事や感じたことを、会話や距離感を考える材料として使ってください。"
     }
     
     // 脈あり診断スコアに基づいた詳細な説明文を返す計算プロパティ
     private var romanticSignDescription: String {
-        switch romanticSignScore {
-        case 0...10: return "残念ながら、相手からの恋愛的な好意のサインはあまり見られません。しかし、良い関係を築くことはできるでしょう。"
-        case 11...20: return "相手はあなたを良い友達として見ているようです。時間をかけて関係を深めることで、変化があるかもしれません。"
-        case 21...30: return "相手はあなたに対して好意を持っているようです。積極的にコミュニケーションを取ることをお勧めします。"
-        case 31...40: return "相手はあなたに対して恋愛感情を抱いている可能性が高いです。自信を持って関係を深めてみましょう。"
-        default: return ""
-        }
+        "相手の考えや気持ちは、この振り返りから決められません。無理に結論を出さず、自分が安心できるペースと境界線を大切にしてください。"
     }
     
     // スマホ脳チェックスコアに基づいた詳細な説明文を返す計算プロパティ
     private var smartphoneBrainDescription: String {
-        switch smartphoneBrainScore {
-        case 0...12: return "スマートフォンを適切に使用できています。現在の使用習慣を維持しましょう。"
-        case 13...24: return "スマートフォンの使用に軽度の問題があります。使用時間を意識して調整することをお勧めします。"
-        case 25...36: return "スマートフォンの使用が生活に中等度の影響を与えています。デジタルデトックスを検討してみましょう。"
-        case 37...48: return "スマートフォンの使用が深刻な影響を与えています。専門家への相談や本格的な使用制限を検討することをお勧めします。"
-        default: return ""
-        }
+        "この結果は良し悪しや健康状態を判定するものではありません。使った場面、眠りや集中との関係、楽になった工夫を自分の記録として眺めてください。"
     }
     
     // ストレスチェックスコアに基づいた詳細な説明文を返す計算プロパティ
     private var stressCheckDescription: String {
-        switch stressCheckScore {
-        case 0...20: return "現在のストレスレベルは低く、良好な状態です。現在の生活習慣を維持しましょう。"
-        case 21...40: return "軽度のストレスがあります。適度な休息とリラクゼーションを心がけましょう。"
-        case 41...60: return "中等度のストレスがあります。ストレス管理の方法を見直し、必要に応じて専門家に相談しましょう。"
-        case 61...80: return "高いストレスレベルです。早急にストレス軽減策を講じ、専門家への相談を強くお勧めします。職場や家庭環境の見直しも検討しましょう。"
-        default: return ""
-        }
+        "この画面は職場向けの標準化チェックを再開した場合にも、状態を断定するためには使いません。今の負担や、休息・相談につながる気づきを記録するための材料です。"
     }
     
     // PHQ-9スコアに基づいた結果の色を返す計算プロパティ
@@ -972,8 +1070,9 @@ struct MentalHealthCheckView: View {
     
     // 選択されたテストを開始する関数
     private func startSelectedTests() {
-        // selectedTestsのセットから要素を配列に変換し、testQueueに設定
-        testQueue = Array(selectedTests)
+        // 一時停止中のチェックが状態に残っていても、実行キューには入れない。
+        testQueue = selectedTests.filter { !$0.isPaused }
+        guard !testQueue.isEmpty else { return }
         // 現在のテストインデックスをリセット
         currentTestIndex = 0
         // ステップを評価中（1）に更新
@@ -1021,6 +1120,7 @@ struct MentalHealthCheckView: View {
     
     // 診断結果をSwiftDataに保存する関数
     private func saveAssessment() {
+        assessmentSaveError = false
         let assessment = MentalHealthAssessment() // 新しいMentalHealthAssessmentインスタンスを作成
         // 選択されたテストの種類を文字列配列に変換して保存
         assessment.selectedTests = selectedTests.map { $0.rawValue }
@@ -1049,27 +1149,28 @@ struct MentalHealthCheckView: View {
         }
         
         if selectedTests.contains(.mutualLove) {
-            assessment.notes += "両思い診断スコア: \(mutualLoveScore)/40 (\(mutualLoveInterpretation))\n"
+            assessment.notes += "関係性の振り返りスコア: \(mutualLoveScore)/40 (\(mutualLoveInterpretation))\n"
         }
         
         if selectedTests.contains(.romanticSign) {
-            assessment.notes += "脈あり診断スコア: \(romanticSignScore)/40 (\(romanticSignInterpretation))\n"
+            assessment.notes += "やりとりの振り返りスコア: \(romanticSignScore)/40 (\(romanticSignInterpretation))\n"
         }
         
         if selectedTests.contains(.smartphoneBrain) {
-            assessment.notes += "スマホ脳チェックスコア: \(smartphoneBrainScore)/48 (\(smartphoneBrainInterpretation))\n"
+            assessment.notes += "スマホとの付き合い方の振り返り: \(smartphoneBrainScore)/48 (\(smartphoneBrainInterpretation))\n"
         }
         
         if selectedTests.contains(.stressCheck) {
-            assessment.notes += "ストレスチェックスコア: \(stressCheckScore)/80 (\(stressCheckInterpretation))\n"
+            assessment.notes += "ストレスの振り返り: \(stressCheckScore)/80 (\(stressCheckInterpretation))\n"
         }
         
         context.insert(assessment) // 作成したassessmentオブジェクトをSwiftDataコンテキストに挿入
         do {
             try context.save() // コンテキストの変更をデータベースに保存
-            print("✅ 診断結果を保存しました") // 保存成功メッセージをコンソールに出力
         } catch {
-            print("❌ 保存エラー: \(error)") // 保存エラーが発生した場合、エラーメッセージをコンソールに出力
+            // 未保存オブジェクトを残さず、入力済みの回答はStateに保持して再試行できるようにする。
+            context.delete(assessment)
+            assessmentSaveError = true
         }
     }
 }
@@ -1089,15 +1190,21 @@ struct TestSelectionCard: View {
                             .font(.headline.bold()) // 太字の見出しフォント
                             .foregroundColor(.primary) // プライマリテキストカラー
                         
-                        Text(testType.description) // テストの説明文
-                            .font(.subheadline) // サブヘッダフォント
-                            .foregroundColor(.secondary) // 二次テキストカラー
+                    Text(testType.description) // テストの説明文
+                        .font(.subheadline) // サブヘッダフォント
+                        .foregroundColor(.secondary) // 二次テキストカラー
+
+                    if testType.isPaused {
+                        Text("現在は利用できません")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
                     }
                     
                     Spacer() // 右端に寄せる
                     
                     // 選択状態に応じてチェックマークアイコンを表示
-                    Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    Image(systemName: testType.isPaused ? "pause.circle" : (isSelected ? "checkmark.circle.fill" : "circle"))
                         .font(.title2) // タイトル2サイズのフォント
                         .foregroundColor(isSelected ? testType.color : .secondary) // 選択時はテストの色、未選択時は二次色
                 }
@@ -1127,6 +1234,9 @@ struct TestSelectionCard: View {
             .animation(.easeInOut(duration: 0.15), value: isSelected) // 選択状態の変化にアニメーションを適用
         }
         .buttonStyle(PlainButtonStyle()) // ボタンのデフォルトスタイルを無効化
+        .disabled(testType.isPaused)
+        .opacity(testType.isPaused ? 0.58 : 1)
+        .accessibilityHint(testType.pauseReason ?? "タップして選択または選択解除")
     }
 }
 
@@ -1345,30 +1455,12 @@ struct ProfessionalAdviceView: View {
     
     // アドバイスのテキストを計算するプライベートプロパティ
     private var advice: String {
-        // 各テストで中等度以上のスコアかどうかを判定
-        let phq9High = (phq9Score ?? 0) >= 10
-        let gad7High = (gad7Score ?? 0) >= 10
-        let k6High = (k6Score ?? 0) >= 10
-        let k10High = (k10Score ?? 0) >= 16
-        
-        // 各テストで軽度のスコアかどうかを判定
-        let phq9Mild = (phq9Score ?? 0) >= 5
-        let gad7Mild = (gad7Score ?? 0) >= 5
-        let k6Mild = (k6Score ?? 0) >= 5
-        let k10Mild = (k10Score ?? 0) >= 8
-        
-        if phq9High || gad7High || k6High || k10High { // いずれかが中等度以上の場合
-            return "スコアが中等度以上です。専門家（精神科医、心理カウンセラー）への相談を強くお勧めします。一人で抱え込まず、適切なサポートを受けることが重要です。"
-        } else if phq9Mild || gad7Mild || k6Mild || k10Mild { // いずれかが軽度の場合
-            return "軽度の症状が認められます。セルフケアを心がけ、症状が続く場合は専門家にご相談ください。"
-        } else { // すべて軽微またはスコアがない場合
-            return "現在の状態は良好のようです。引き続き心の健康を維持するためのセルフケアを続けましょう。"
-        }
+        "標準化されたチェックの数値だけで、心の状態や必要な支援を決めることはできません。気になることが続く場合は、自分の言葉で家族・先生・専門家へ相談してください。"
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("専門的なアドバイス")
+            Text("参考にするための案内")
                 .font(.headline.bold())
             
             Text(advice) // 計算されたアドバイスを表示
@@ -1389,32 +1481,12 @@ struct LoveAdviceView: View {
     
     // アドバイスのテキストを計算するプライベートプロパティ
     private var advice: String {
-        let hasMutualLoveScore = mutualLoveScore != nil // 両思い診断スコアがあるか
-        let hasRomanticSignScore = romanticSignScore != nil // 脈あり診断スコアがあるか
-        
-        if hasMutualLoveScore && hasRomanticSignScore { // 両方のスコアがある場合
-            let mutual = mutualLoveScore ?? 0
-            let sign = romanticSignScore ?? 0
-            
-            if mutual >= 31 && sign >= 31 { // 両方とも高スコアの場合
-                return "両思い診断と脈あり診断の両方で高スコアです。お互いに深い愛情を抱いている素晴らしい関係のようです。"
-            } else if mutual >= 21 && sign >= 21 { // 両方とも中程度以上のスコアの場合
-                return "お互いに恋愛感情を抱いており、良好な関係を築いているようです。この関係を大切に育んでください。"
-            } else { // それ以外の場合
-                return "関係は発展途上のようです。時間をかけて相手との絆を深めていくことが大切です。"
-            }
-        } else if hasMutualLoveScore { // 両思い診断スコアのみある場合
-            return "両思い診断の結果から、関係の現在地が見えてきました。お互いを大切にする気持ちを持ち続けてください。"
-        } else if hasRomanticSignScore { // 脈あり診断スコアのみある場合
-            return "脈あり診断の結果から、相手の気持ちが推測できました。一つの参考として、自分の気持ちと向き合ってみてください。"
-        }
-        
-        return "恋愛は人それぞれ。あなたらしさを大切にしながら、素敵な関係を築いていってください。" // どのスコアもない場合
+        "相手の気持ちを推測したり、関係に名前をつけたりするための結果ではありません。自分が安心できる距離感と、話してみたいことを考える材料にしてください。"
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("恋愛アドバイス")
+            Text("関係性を振り返るための案内")
                 .font(.headline.bold())
             
             Text(advice) // 計算されたアドバイスを表示
@@ -1433,23 +1505,12 @@ struct DigitalHealthAdviceView: View {
     
     // アドバイスのテキストを計算するプライベートプロパティ
     private var advice: String {
-        switch smartphoneBrainScore {
-        case 0...12: // 低スコアの場合
-            return "素晴らしい！健康的なスマートフォン使用を継続してください。現在の使用習慣を維持し、定期的にデジタルデトックスを行いましょう。"
-        case 13...24: // 軽度影響の場合
-            return "軽度の影響が見られます。使用時間の制限、就寝前の使用を控える、集中時間にはスマートフォンを別の場所に置くなどの対策を検討しましょう。"
-        case 25...36: // 中等度影響の場合
-            return "中等度の影響があります。アプリの使用時間制限機能を活用し、定期的なデジタルデトックスを実践し、リアルな活動を増やすことをお勧めします。"
-        case 37...48: // 重度影響の場合
-            return "深刻な影響が見られます。専門家への相談を検討し、段階的な使用制限、代替活動の充実、家族や友人のサポートを求めることをお勧めします。"
-        default: // その他の場合
-            return "スマートフォンとの健康的な関係を築くことが重要です。"
-        }
+        "スマートフォンの使用を良し悪しで判定しません。眠り、集中、気分、友人との時間など、自分が大切にしたいこととの関係を少しずつ観察できます。"
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("デジタル健康アドバイス")
+            Text("スマホとの付き合い方を振り返る案内")
                 .font(.headline.bold())
             
             Text(advice) // 計算されたアドバイスを表示
@@ -1468,23 +1529,12 @@ struct StressAdviceView: View {
     
     // アドバイスのテキストを計算するプライベートプロパティ
     private var advice: String {
-        switch stressScore {
-        case 0...20: // 低ストレスの場合
-            return "素晴らしい！現在のストレスレベルは低く、良好な状態です。現在の生活習慣やストレス管理方法を維持してください。"
-        case 21...40: // 軽度ストレスの場合
-            return "軽度のストレスがあります。定期的な運動、十分な睡眠、リラクゼーション活動を取り入れて、ストレスを適切に管理しましょう。"
-        case 41...60: // 中等度ストレスの場合
-            return "中等度のストレスがあります。ストレス源の特定、時間管理の改善、サポートシステムの活用、必要に応じて専門家への相談を検討しましょう。"
-        case 61...80: // 高ストレスの場合
-            return "高いストレスレベルです。早急にストレス軽減策を講じ、専門家（カウンセラー、医師）への相談を強くお勧めします。職場や家庭環境の見直しも検討しましょう。"
-        default: // その他の場合
-            return "ストレスとの上手な付き合い方を身につけることが重要です。"
-        }
+        "ここに表示される数値は状態の良し悪しを決めません。負担が続く場合は、休むことや、家族・先生・専門家に相談することも選択肢です。"
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("ストレス管理アドバイス")
+            Text("負担を振り返るための案内")
                 .font(.headline.bold())
             
             Text(advice) // 計算されたアドバイスを表示
@@ -1501,20 +1551,22 @@ struct StressAdviceView: View {
 struct ConsultationResourcesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("相談窓口・リソース")
+            Text("相談先を知る")
                 .font(.headline.bold())
+
+            Text("地域や時間帯によってつながり方が異なることがあります。公式案内で最新情報を確認してください。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
             
-            // 電話相談へのリンク
             Link("こころの健康相談統一ダイヤル（0570-064-556）", destination: URL(string: "tel:0570064556")!)
                 .foregroundColor(.blue)
             
-            Link("いのちの電話（0570-783-556）", destination: URL(string: "tel:0570783556")!)
+            Link("厚生労働省の相談先一覧を見る", destination: URL(string: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/")!)
                 .foregroundColor(.blue)
-            
-            // 緊急時の注意喚起
-            Text("※緊急時は迷わず119番または最寄りの救急外来を受診してください")
+
+            Text("家族、担任の先生、スクールカウンセラー、保健室、信頼できる大人に声をかける方法もあります。今すぐ危険がある場合は119番、または近くの大人・救急外来へつないでください。")
                 .font(.caption)
-                .foregroundColor(.red) // 赤色で強調
+                .foregroundColor(.red)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
@@ -1523,19 +1575,19 @@ struct ConsultationResourcesView: View {
     }
 }
 
-// 医療免責事項を表示するビュー
+// 自己観察の位置づけを表示するビュー
 struct DisclaimerView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Image(systemName: "exclamationmark.triangle.fill") // 注意喚起アイコン
-                Text("【重要】医療免責事項") // タイトル
+                Text("自己観察について") // タイトル
             }
             .font(.headline) // 見出しフォント
             .foregroundColor(.orange) // オレンジ色
             
             // 免責事項の本文
-            Text("このセルフチェックは医学的診断に代わるものではありません。結果にかかわらず、心の不調が続く場合や日常生活に支障がある場合は、必ず医師やカウンセラーなどの専門家にご相談ください。")
+            Text("この画面は医療的な診断や評価を行うものではありません。結果を理由に自分を責めず、気になる状態が続く場合は、家族・先生・相談窓口・医療機関など、話しやすい相手へ相談してください。")
                 .font(.caption) // キャプションフォント
         }
         .padding() // パディング
@@ -1544,4 +1596,3 @@ struct DisclaimerView: View {
         .padding(.horizontal) // 水平方向のパディング
     }
 }
-
