@@ -142,6 +142,15 @@ struct MentalHealthCheckView: View {
             default: return "questionmark.circle"
             }
         }
+
+        var lineIconKind: DiaryLineIconKind {
+            switch self {
+            case .phq9, .gad7, .k6, .k10: return .journal
+            case .mutualLove, .romanticSign: return .cloudSun
+            case .smartphoneBrain: return .smallSun
+            case .stressCheck: return .cloud
+            }
+        }
     }
     
     // PHQ-9テストの質問リスト
@@ -430,28 +439,20 @@ struct MentalHealthCheckView: View {
                 // カテゴリごとにテストカードを表示
                 VStack(spacing: 20) {
                     // メンタルヘルスカテゴリのセクション
-                    categorySection(title: "メンタルヘルス",
-                                  tests: [.phq9, .gad7, .k6, .k10],
-                                  icon: "heart.text.square",
-                                  color: .blue)
+                    categorySection(title: "心の振り返り",
+                                  tests: [.phq9, .gad7, .k6, .k10])
                     
                     // 恋愛診断カテゴリのセクション
                     categorySection(title: "関係性の振り返り",
-                                  tests: [.mutualLove, .romanticSign],
-                                  icon: "heart.fill",
-                                  color: .pink)
+                                  tests: [.mutualLove, .romanticSign])
                     
                     // デジタル健康カテゴリのセクション
-                    categorySection(title: "デジタル健康",
-                                  tests: [.smartphoneBrain],
-                                  icon: "iphone",
-                                  color: .orange)
+                    categorySection(title: "スマホとの付き合い方",
+                                  tests: [.smartphoneBrain])
                     
                     // ストレスカテゴリのセクション
-                    categorySection(title: "ストレス",
-                                  tests: [.stressCheck],
-                                  icon: "gauge.high",
-                                  color: .green)
+                    categorySection(title: "職場向けチェック",
+                                  tests: [.stressCheck])
                 }
                 
                 // 選択されたテストがある場合に、選択数と推定所要時間を表示
@@ -462,9 +463,9 @@ struct MentalHealthCheckView: View {
                             .foregroundColor(.secondary)
                         
                         // estimatedTimeプロパティ（計算プロパティ）を使用して所要時間を表示
-                        Text("所要時間: 約\(estimatedTime)分")
+                        Text("必要な時間: 約\(estimatedTime)分")
                             .font(.caption) // キャプションサイズのフォント
-                            .foregroundColor(.blue) // 青色で表示
+                            .foregroundColor(DiaryTheme.primary)
                     }
                 }
                 
@@ -477,7 +478,7 @@ struct MentalHealthCheckView: View {
                 .frame(maxWidth: .infinity) // 幅を最大に
                 .padding() // 内側のパディング
                 // 選択が空の場合はグレー、選択がある場合は青色のグラデーション背景
-                .background(selectedTests.isEmpty ? Color.gray.gradient : Color.blue.gradient)
+                .background(selectedTests.isEmpty ? DiaryTheme.muted : DiaryTheme.primary)
                 .cornerRadius(12) // 角を丸くする
                 .disabled(selectedTests.isEmpty) // 選択がない場合はボタンを無効化
             }
@@ -487,18 +488,18 @@ struct MentalHealthCheckView: View {
     
     // カテゴリごとのテストカードセクションを生成するヘルパー関数
     @ViewBuilder
-    private func categorySection(title: String, tests: [TestType], icon: String, color: Color) -> some View {
+    private func categorySection(title: String, tests: [TestType]) -> some View {
         // カテゴリセクションの垂直スタック
         VStack(alignment: .leading, spacing: 16) {
             // カテゴリタイトルとアイコン
-            HStack {
-                Image(systemName: icon) // カテゴリに対応するシステムアイコン
-                    .font(.title2) // アイコンのフォントサイズ
-                    .foregroundColor(color) // カテゴリの色
+            HStack(spacing: 10) {
+                if let kind = tests.first?.lineIconKind {
+                    DiaryLineIcon(kind: kind, color: DiaryTheme.primary, size: 28)
+                }
                 
                 Text(title) // カテゴリ名
                     .font(.headline.bold()) // 太字の見出しフォント
-                    .foregroundColor(color) // カテゴリの色
+                    .foregroundColor(DiaryTheme.ink)
                 
                 Spacer() // 右端に寄せる
             }
@@ -524,8 +525,11 @@ struct MentalHealthCheckView: View {
             }
         }
         .padding() // セクションの内側にパディング
-        .background(color.opacity(0.05)) // カテゴリの色を薄めた背景色
-        .cornerRadius(16) // 角を丸くする
+        .background(DiaryTheme.surface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(DiaryTheme.line, lineWidth: 1)
+        }
     }
     
     // 評価（質問）画面のビュー
@@ -1185,6 +1189,12 @@ struct TestSelectionCard: View {
         Button(action: onTap) { // ボタンとして機能し、タップ時にonTapクロージャを実行
             VStack(alignment: .leading, spacing: 16) {
                 HStack { // 表示名と説明文
+                    DiaryLineIcon(
+                        kind: testType.lineIconKind,
+                        color: testType.isPaused ? DiaryTheme.muted : DiaryTheme.primary,
+                        size: 30
+                    )
+
                     VStack(alignment: .leading, spacing: 4) {
                         Text(testType.displayName) // テストの表示名
                             .font(.headline.bold()) // 太字の見出しフォント
@@ -1206,13 +1216,13 @@ struct TestSelectionCard: View {
                     // 選択状態に応じてチェックマークアイコンを表示
                     Image(systemName: testType.isPaused ? "pause.circle" : (isSelected ? "checkmark.circle.fill" : "circle"))
                         .font(.title2) // タイトル2サイズのフォント
-                        .foregroundColor(isSelected ? testType.color : .secondary) // 選択時はテストの色、未選択時は二次色
+                        .foregroundColor(isSelected ? DiaryTheme.primary : DiaryTheme.muted)
                 }
                 
                 HStack { // カテゴリと質問数
-                    Label(testType.category, systemImage: testType.systemIcon) // カテゴリ名とアイコン
+                    Text(testType.category)
                         .font(.caption) // キャプションフォント
-                        .foregroundColor(testType.color) // カテゴリの色
+                        .foregroundColor(DiaryTheme.muted)
                     
                     Spacer() // 右端に寄せる
                     
@@ -1224,14 +1234,13 @@ struct TestSelectionCard: View {
             .padding() // カード内部のパディング
             .background( // 背景設定
                 RoundedRectangle(cornerRadius: 12) // 角丸の背景
-                    .fill(isSelected ? testType.color.opacity(0.1) : Color(.systemGray6)) // 選択時はテストの色を薄く、未選択時はシステムグレー6
+                    .fill(isSelected ? DiaryTheme.primary.opacity(0.12) : DiaryTheme.elevatedSurface)
             )
             .overlay( // カードの縁取り
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? testType.color : .clear, lineWidth: 2) // 選択時はテストの色で、太さ2の線、未選択時は線なし
+                    .stroke(isSelected ? DiaryTheme.primary : DiaryTheme.line, lineWidth: isSelected ? 2 : 1)
             )
-            .scaleEffect(isSelected ? 1.02 : 1.0) // 選択時は少し拡大
-            .animation(.easeInOut(duration: 0.15), value: isSelected) // 選択状態の変化にアニメーションを適用
+            .animation(.easeInOut(duration: 0.15), value: isSelected)
         }
         .buttonStyle(PlainButtonStyle()) // ボタンのデフォルトスタイルを無効化
         .disabled(testType.isPaused)
@@ -1566,7 +1575,7 @@ struct ConsultationResourcesView: View {
 
             Text("家族、担任の先生、スクールカウンセラー、保健室、信頼できる大人に声をかける方法もあります。今すぐ危険がある場合は119番、または近くの大人・救急外来へつないでください。")
                 .font(.caption)
-                .foregroundColor(.red)
+                .foregroundStyle(DiaryTheme.emergency)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
