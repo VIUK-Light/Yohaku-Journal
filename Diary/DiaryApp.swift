@@ -56,7 +56,8 @@ enum DiaryRuntime {
 #if targetEnvironment(macCatalyst)
         true
 #else
-        ProcessInfo.processInfo.isiOSAppOnMac
+        // Designed for iPad on Macの経路は使わず、MacはMac Catalyst版だけを使用する。
+        false
 #endif
     }
 }
@@ -88,7 +89,7 @@ struct ScienceClubDiaryApp: App {
         WindowGroup {
             MoodJournalView()
                 .tint(DiaryTheme.accent)
-#if canImport(UIKit)
+#if targetEnvironment(macCatalyst)
                 .background(MacWindowConfigurator())
 #endif
         }
@@ -101,7 +102,7 @@ struct ScienceClubDiaryApp: App {
     }
 }
 
-#if canImport(UIKit)
+#if targetEnvironment(macCatalyst)
 /// 保存済みの縦長ウィンドウが残っていても、Macの2カラムUIを表示できる幅へ戻す。
 private struct MacWindowConfigurator: UIViewRepresentable {
     private let minimumSize = CGSize(width: 1024, height: 700)
