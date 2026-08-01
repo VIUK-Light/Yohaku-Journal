@@ -122,7 +122,7 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         }
     }
 
-    func testAssessmentValidationRejectsEachInvalidBoundaryIndividually() {
+    func testAssessmentValidationRejectsEachInvalidBoundaryIndividually() throws {
         let invalidCases: [(String, ArchivedMentalHealthAssessment, DiaryArchiveValidationError)] = [
             ("PHQ回答 -1", makeAssessment(phq9Answers: [-1]), .invalidAssessmentValue),
             ("PHQ回答 4", makeAssessment(phq9Answers: [4]), .invalidAssessmentValue),
