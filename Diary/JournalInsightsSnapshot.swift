@@ -88,7 +88,11 @@ enum JournalInsightsCalculator {
             moodByDay[day, default: MoodAggregate()].count += 1
             moodByDay[day, default: MoodAggregate()].total += entry.moodScore
 
-            for event in Set(entry.influences) where !event.isEmpty {
+            let normalizedEvents = Set(entry.influences.compactMap { event in
+                let trimmed = event.trimmingCharacters(in: .whitespacesAndNewlines)
+                return trimmed.isEmpty ? nil : trimmed
+            })
+            for event in normalizedEvents {
                 events[event, default: MoodAggregate()].count += 1
                 events[event, default: MoodAggregate()].total += entry.moodScore
             }

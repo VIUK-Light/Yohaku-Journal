@@ -80,6 +80,25 @@ final class JournalInsightsSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.moodTrend.last?.averageScore, 4)
     }
 
+    func testEventTagsAreTrimmedAndEmptyTagsAreIgnored() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let entry = MoodEntry()
+        entry.date = now
+        entry.moodScore = 5
+        entry.influences = [" 学校 ", "学校", "   ", "\n"]
+
+        let snapshot = JournalInsightsCalculator.make(
+            entries: [entry],
+            range: .all,
+            now: now,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(snapshot.eventTagTypeCount, 1)
+        XCTAssertEqual(snapshot.eventBreakdowns.map(\.name), ["学校"])
+        XCTAssertEqual(snapshot.eventBreakdowns.first?.entryCount, 1)
+    }
+
     private func makeEntry(date: Date, score: Int, tag: String) -> MoodEntry {
         let entry = MoodEntry()
         entry.date = date
