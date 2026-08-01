@@ -1,0 +1,54 @@
+name: Swift Tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: swift-tests-${{ github.repository }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: XCTest
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: macos-15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Select an available iPhone simulator
+        id: simulator
+        shell: bash
+        run: |
+          device_id="$(xcrun simctl list devices available -j | python3 -c '
+          import json
+          import sys
+
+          devices = json.load(sys.stdin).get("devices", {})
+          preferred = ("iPhone 17 Pro", "iPhone 17", "iPhone 16 Pro", "iPhone 16")
+          for name in preferred:
+              for runtime_devices in devices.values():
+                  for device in runtime_devices:
+                      if device.get("isAvailable") and device.get("name") == name:
+                          print(device["udid"])
+                          raise SystemExit
+          ')
+          test -n "$device_id"
+          echo "id=$device_id" >> "$GITHUB_OUTPUT"
+
+      - name: Run XCTest
+        run: |
+          xcodebuild test \
+            -project "Science Club Diary.xcodeproj" \
+            -scheme "Science Club Diary" \
+            -destination "id=${{ steps.simulator.outputs.id }}" \
+            -derivedDataPath "$RUNNER_TEMP/xctest-derived" \
+            -parallel-testing-enabled NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO
