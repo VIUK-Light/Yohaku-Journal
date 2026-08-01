@@ -11,6 +11,8 @@
 		20CB64F5B4A12278AA6DD7E2 /* NewMoodEntryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */; };
 		232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */; };
 		2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6284A7417F6F4E775C212446 /* MoodJournalView.swift */; };
+		26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */; };
+		283755B4C7F0EEE7E5C3BB7C /* RecordKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7674FA667D8FF29B01AF59 /* RecordKind.swift */; };
 		2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */; };
 		36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DF0CB09392151B28AD6F7 /* MoodEntry.swift */; };
 		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
@@ -18,10 +20,22 @@
 		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
 		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */; };
 		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		8C1717150468F36C89C07914 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6752128DC9EEE499D866A243 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C010471BE0DE6B3112090CA1;
+			remoteInfo = "Science Club Diary";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryDraft.swift; sourceTree = "<group>"; };
 		3115FFDFC83C98AD90565965 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
 		35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryLineIcon.swift; sourceTree = "<group>"; };
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
@@ -30,6 +44,9 @@
 		736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthAssessment.swift; sourceTree = "<group>"; };
 		787DF0CB09392151B28AD6F7 /* MoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntry.swift; sourceTree = "<group>"; };
 		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
+		8ECE76C81883ED0739846B7B /* Science Club DiaryTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Science Club DiaryTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryPersistenceTests.swift; sourceTree = "<group>"; };
+		9B7674FA667D8FF29B01AF59 /* RecordKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordKind.swift; sourceTree = "<group>"; };
 		9E9F747607977F6DE87AC4BC /* Science Club Diary.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Science Club Diary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSafetyCheckRecord.swift; sourceTree = "<group>"; };
 		DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoodEntryView.swift; sourceTree = "<group>"; };
@@ -38,6 +55,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		466CA381E77D0844026D5FAC /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				877683AD2EB92AAA0D11D390 /* ScienceClubDiaryTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
 		80CA678744417BD68760E4D0 /* Diary */ = {
 			isa = PBXGroup;
 			children = (
@@ -45,6 +70,7 @@
 				FFB67B6060F19002D6ACE327 /* ArticleListView.swift */,
 				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
 				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
+				0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */,
 				AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */,
 				736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */,
 				5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */,
@@ -52,15 +78,25 @@
 				51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */,
 				6284A7417F6F4E775C212446 /* MoodJournalView.swift */,
 				DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */,
+				9B7674FA667D8FF29B01AF59 /* RecordKind.swift */,
 				84991957D3523758A1F8DA62 /* SelectableButton.swift */,
 			);
 			path = Diary;
+			sourceTree = "<group>";
+		};
+		877683AD2EB92AAA0D11D390 /* ScienceClubDiaryTests */ = {
+			isa = PBXGroup;
+			children = (
+				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
+			);
+			path = ScienceClubDiaryTests;
 			sourceTree = "<group>";
 		};
 		C1C35612FBFB7610EED2EFE0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				9E9F747607977F6DE87AC4BC /* Science Club Diary.app */,
+				8ECE76C81883ED0739846B7B /* Science Club DiaryTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				80CA678744417BD68760E4D0 /* Diary */,
+				466CA381E77D0844026D5FAC /* Tests */,
 				C1C35612FBFB7610EED2EFE0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,6 +113,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		463149E47BC3377E1AE85EC2 /* Science Club DiaryTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 90FD518A8AA669F27F1CFEE7 /* Build configuration list for PBXNativeTarget "Science Club DiaryTests" */;
+			buildPhases = (
+				990BF6170690AF22D7DBF172 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				90A19ACE298E245E902B0278 /* PBXTargetDependency */,
+			);
+			name = "Science Club DiaryTests";
+			packageProductDependencies = (
+			);
+			productName = "Science Club DiaryTests";
+			productReference = 8ECE76C81883ED0739846B7B /* Science Club DiaryTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C010471BE0DE6B3112090CA1 /* Science Club Diary */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B9A8E634D38B68AAFFCAB2FC /* Build configuration list for PBXNativeTarget "Science Club Diary" */;
@@ -122,6 +177,7 @@
 			projectRoot = "";
 			targets = (
 				C010471BE0DE6B3112090CA1 /* Science Club Diary */,
+				463149E47BC3377E1AE85EC2 /* Science Club DiaryTests */,
 			);
 		};
 /* End PBXProject section */
@@ -135,6 +191,7 @@
 				689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */,
 				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
 				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
+				DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */,
 				4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */,
 				2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */,
 				FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */,
@@ -142,11 +199,28 @@
 				562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */,
 				2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */,
 				20CB64F5B4A12278AA6DD7E2 /* NewMoodEntryView.swift in Sources */,
+				283755B4C7F0EEE7E5C3BB7C /* RecordKind.swift in Sources */,
 				80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		990BF6170690AF22D7DBF172 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		90A19ACE298E245E902B0278 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C010471BE0DE6B3112090CA1 /* Science Club Diary */;
+			targetProxy = 8C1717150468F36C89C07914 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		18EC6CCFC5EA2956FD59AB5A /* Debug */ = {
@@ -272,6 +346,42 @@
 			};
 			name = Release;
 		};
+		8338565D9856F2620D76920E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = viuk.scienceclub.diary.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Science Club Diary.app/Science Club Diary";
+			};
+			name = Release;
+		};
+		86FE7BD6738DC129B00986B7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = viuk.scienceclub.diary.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Science Club Diary.app/Science Club Diary";
+			};
+			name = Debug;
+		};
 		BC0D62F90BC8525BEA842772 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -336,6 +446,15 @@
 			buildConfigurations = (
 				18EC6CCFC5EA2956FD59AB5A /* Debug */,
 				BC0D62F90BC8525BEA842772 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		90FD518A8AA669F27F1CFEE7 /* Build configuration list for PBXNativeTarget "Science Club DiaryTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				86FE7BD6738DC129B00986B7 /* Debug */,
+				8338565D9856F2620D76920E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
