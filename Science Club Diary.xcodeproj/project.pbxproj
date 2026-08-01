@@ -25,6 +25,7 @@
 		75BCDC536D32E3D3CFDECBCC /* SelfCheckDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15E1EC3B2579EC051B3A25F /* SelfCheckDefinition.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
 		827E8964EDF0CC0608063A65 /* SafetyCheckPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E1EFCF430E699B30EFD918 /* SafetyCheckPersistence.swift */; };
+		A555B4254CD7D97D3D8DB44B /* SelfCheckResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5B2238BD2A3C2F4CB378216 /* SelfCheckResultView.swift */; };
 		AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */; };
 		AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */; };
 		B58896F34741D464B7B41717 /* JournalTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17495CDEA94E8866453E0700 /* JournalTimeline.swift */; };
@@ -69,6 +70,7 @@
 		C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimelineTests.swift; sourceTree = "<group>"; };
 		CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsView.swift; sourceTree = "<group>"; };
 		D30C356F40BD31F517932094 /* JournalTimelineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimelineRow.swift; sourceTree = "<group>"; };
+		D5B2238BD2A3C2F4CB378216 /* SelfCheckResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheckResultView.swift; sourceTree = "<group>"; };
 		DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoodEntryView.swift; sourceTree = "<group>"; };
 		E3602C212FA0CF313F99C3FE /* DiaryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryApp.swift; sourceTree = "<group>"; };
 		E9CDD149CF611554A8314B4C /* JournalRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalRecordView.swift; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				84991957D3523758A1F8DA62 /* SelectableButton.swift */,
 				F15E1EC3B2579EC051B3A25F /* SelfCheckDefinition.swift */,
 				46062127FCC4D4FF7BE17066 /* SelfCheckEvidence.swift */,
+				D5B2238BD2A3C2F4CB378216 /* SelfCheckResultView.swift */,
 			);
 			path = Diary;
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 				80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */,
 				75BCDC536D32E3D3CFDECBCC /* SelfCheckDefinition.swift in Sources */,
 				F506CA63349371939BC8FFF0 /* SelfCheckEvidence.swift in Sources */,
+				A555B4254CD7D97D3D8DB44B /* SelfCheckResultView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
