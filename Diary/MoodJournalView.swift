@@ -52,11 +52,19 @@ struct MoodJournalView: View {
     }
 
     var body: some View {
-        GeometryReader { geometry in
-            if horizontalSizeClass == .compact {
-                compactShell
-            } else {
-                splitShell(for: geometry.size)
+        ZStack {
+            DiaryTheme.canvas
+                .ignoresSafeArea()
+
+            GeometryReader { geometry in
+                Group {
+                    if horizontalSizeClass == .compact {
+                        compactShell
+                    } else {
+                        splitShell(for: geometry.size)
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -93,7 +101,9 @@ struct MoodJournalView: View {
                     compactDestination(destination)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         )
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func splitShell(for size: CGSize) -> some View {
@@ -110,7 +120,9 @@ struct MoodJournalView: View {
             .onChange(of: size) { _, newSize in
                 updateSplitVisibility(for: newSize)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         )
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     private func journalChrome<Content: View>(_ content: Content) -> some View {
@@ -572,7 +584,7 @@ struct JournalRecordView: View {
                         .foregroundStyle(DiaryTheme.moodColor(for: todayEntry.moodScore))
                     Text("・")
                         .foregroundStyle(DiaryTheme.muted)
-                    Text("気分 (todayEntry.moodScore)/7")
+                    Text("今日の記録")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(DiaryTheme.muted)
                 }
@@ -595,7 +607,12 @@ struct JournalRecordView: View {
             .buttonStyle(.borderedProminent)
             .buttonBorderShape(.roundedRectangle(radius: 12))
             .controlSize(.large)
-            .tint(DiaryTheme.accent)
+            .tint(DiaryTheme.primary)
+
+            Text("必要なときに、必要なだけ使えます。")
+                .font(.caption)
+                .foregroundStyle(DiaryTheme.muted)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .frame(maxWidth: 680, alignment: .leading)
         .padding(.vertical, 8)
@@ -1052,9 +1069,6 @@ struct MoodEntryRow: View {
                 Text(japaneseDateTimeString(from: entry.date))
                     .font(.caption)
                     .foregroundStyle(DiaryTheme.muted)
-                Text("\(entry.moodScore)/7")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(DiaryTheme.moodColor(for: entry.moodScore))
             }
         }
         .padding(.vertical, 5)
