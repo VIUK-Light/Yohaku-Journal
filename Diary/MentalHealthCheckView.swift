@@ -9,9 +9,9 @@ struct MentalHealthCheckView: View {
     @Environment(\.dismiss) private var dismiss
     
     // 選択されたテストのセットを保持する状態変数
-    @State private var selectedTests: Set<TestType> = []
+    @State private var selectedTests: Set<SelfCheckType> = []
     // 実行するテストのキュー（順番）を保持する状態変数
-    @State private var testQueue: [TestType] = []
+    @State private var testQueue: [SelfCheckType] = []
     // 現在実行中のテストのインデックス
     @State private var currentTestIndex = 0
     // 現在のビューの状態（0: テスト選択、1: 評価中、2: 結果表示）
@@ -44,241 +44,11 @@ struct MentalHealthCheckView: View {
         var id: String { rawValue }
     }
     
-    // 診断テストの種類を定義する列挙型
-    enum TestType: String, CaseIterable {
-        case phq9 = "PHQ-9"
-        case gad7 = "GAD-7"
-        case k6 = "K6"
-        case k10 = "K10"
-        case mutualLove = "関係性を振り返る"
-        case romanticSign = "やりとりを振り返る"
-        case smartphoneBrain = "スマホとの付き合い方を振り返る"
-        case stressCheck = "職場向けストレスチェック（停止中）"
-        
-        // テストの表示名（ローカライズ対応）
-        var displayName: String {
-            switch self {
-            case .phq9: return "抑うつ症状チェック（PHQ-9）"
-            case .gad7: return "不安症状チェック（GAD-7）"
-            case .k6: return "心理的苦痛チェック（K6）"
-            case .k10: return "心理的苦痛チェック（K10）"
-            case .mutualLove: return "関係性を振り返る"
-            case .romanticSign: return "やりとりを振り返る"
-            case .smartphoneBrain: return "スマホとの付き合い方を振り返る"
-            case .stressCheck: return "職場向けストレスチェック（停止中）"
-            }
-        }
-        
-        // テストの説明文
-        var description: String {
-            switch self {
-            case .phq9: return "標準化された質問票のため、現在は新規実行を停止しています。"
-            case .gad7: return "標準化された質問票のため、現在は新規実行を停止しています。"
-            case .k6: return "標準化された質問票のため、現在は新規実行を停止しています。"
-            case .k10: return "標準化された質問票のため、現在は新規実行を停止しています。"
-            case .mutualLove: return "相手の気持ちを決めつけず、自分が感じた出来事を振り返ります（10問）"
-            case .romanticSign: return "やりとりの中で自分が気づいたことを振り返ります（10問）"
-            case .smartphoneBrain: return "使った場面や、その後の自分の感覚を振り返ります（12問）"
-            case .stressCheck: return "職場向けの標準化チェックのため、現在は新規実行を停止しています。"
-            }
-        }
-
-        var isPaused: Bool {
-            switch self {
-            case .phq9, .gad7, .k6, .k10, .stressCheck: return true
-            case .mutualLove, .romanticSign, .smartphoneBrain: return false
-            }
-        }
-
-        var pauseReason: String? {
-            isPaused ? "中高生を主対象とする現在の設計では、標準化された判定を一時停止しています。" : nil
-        }
-        
-        // テストに関連付けられた色
-        var color: Color {
-            switch self {
-            case .phq9: return .blue
-            case .gad7: return .purple
-            case .k6: return .indigo
-            case .k10: return .cyan
-            case .mutualLove: return .pink
-            case .romanticSign: return .red
-            case .smartphoneBrain: return .orange
-            case .stressCheck: return .green
-            }
-        }
-        
-        // テストのカテゴリ（例: "メンタルヘルス", "恋愛"）
-        var category: String {
-            switch self {
-            case .phq9, .gad7, .k6, .k10: return "メンタルヘルス"
-            case .mutualLove, .romanticSign: return "恋愛"
-            case .smartphoneBrain: return "デジタル健康"
-            case .stressCheck: return "ストレス"
-            }
-        }
-        
-        // テストの質問数（文字列）
-        var questionCount: String {
-            switch self {
-            case .phq9: return "9問"
-            case .gad7: return "7問"
-            case .k6: return "6問"
-            case .k10: return "10問"
-            case .mutualLove: return "10問"
-            case .romanticSign: return "10問"
-            case .smartphoneBrain: return "12問"
-            case .stressCheck: return "20問"
-            }
-        }
-        
-        // カテゴリに対応するシステムアイコン名
-        var systemIcon: String {
-            switch self.category {
-            case "メンタルヘルス": return "heart.text.square"
-            case "恋愛": return "heart.fill"
-            case "デジタル健康": return "iphone"
-            case "ストレス": return "gauge.high"
-            default: return "questionmark.circle"
-            }
-        }
-
-        var lineIconKind: DiaryLineIconKind {
-            switch self {
-            case .phq9, .gad7, .k6, .k10: return .journal
-            case .mutualLove, .romanticSign: return .cloudSun
-            case .smartphoneBrain: return .smallSun
-            case .stressCheck: return .cloud
-            }
-        }
-    }
+    // 定義・根拠・利用可否はSelfCheckDefinition.swiftに集約する。
+    // Viewは表示と入力イベントだけを担当する。
+    typealias TestType = SelfCheckType
     
     // PHQ-9テストの質問リスト
-    private let phq9Questions = [
-        "物事に対してほとんど興味がない、または楽しめない",
-        "気分が落ち込む、憂うつになる、または絶望的な気持ちになる",
-        "寝つきが悪い、途中で目が覚める、または逆に眠りすぎる",
-        "疲れた感じがする、または気力がない",
-        "あまり食欲がない、または食べ過ぎる",
-        "自分はダメな人間だ、または家族を失望させているという気持ちになる",
-        "新聞を読む、テレビを見るなどの事に集中することが難しい",
-        "動作や話し方が遅くなった、または落ち着かない、そわそわして普段よりも動き回る",
-        "死んだ方がましだ、または自分を何らかの方法で傷つけようと思ったことがある"
-    ]
-    
-    // GAD-7テストの質問リスト
-    private let gad7Questions = [
-        "神経質になったり、不安になったり、イライラしたりする",
-        "心配するのを止めることができない、またはコントロールできない",
-        "さまざまなことを心配しすぎる",
-        "リラックスすることが困難",
-        "じっとしていられないほど落ち着かない",
-        "容易にいらだったり、イライラしたりする",
-        "何か恐ろしいことが起こるのではないかと恐怖を感じる"
-    ]
-    
-    // K6テストの質問リスト
-    private let k6Questions = [
-        "神経過敏に感じましたか",
-        "絶望的だと感じましたか",
-        "そわそわ、落ち着かなく感じましたか",
-        "気分が沈み込んで、何が起こっても気が晴れないように感じましたか",
-        "何をするのも骨折りだと感じましたか",
-        "自分は価値のない人間だと感じましたか"
-    ]
-    
-    // K10テストの質問リスト
-    private let k10Questions = [
-        "疲れきってしまったと感じましたか",
-        "神経過敏に感じましたか",
-        "そわそわ、落ち着かなく感じましたか",
-        "絶望的だと感じましたか",
-        "何をするのも骨折りだと感じましたか",
-        "価値のない人間だと感じましたか",
-        "悲しいと感じましたか",
-        "自分がダメな人間だと感じましたか",
-        "気分が沈み込んで、何が起こっても気が晴れないように感じましたか",
-        "何もかもがうまくいかないと感じましたか"
-    ]
-    
-    // 両思い診断の質問リスト
-    private let mutualLoveQuestions = [
-        "お互いに相手のことを第一に考えている",
-        "一緒にいる時間が自然で心地よい",
-        "お互いの将来について話し合ったことがある",
-        "相手があなたのことを友人や家族に紹介してくれた",
-        "お互いに素の自分を見せることができている",
-        "連絡を取り合う頻度がお互いに心地よい",
-        "お互いに困った時に最初に相談し合える関係",
-        "相手があなたの好きなことや趣味に興味を示してくれる",
-        "お互いに相手の幸せを心から願っている",
-        "この関係が特別で大切だと感じている"
-    ]
-    
-    // 脈あり診断の質問リスト
-    private let romanticSignQuestions = [
-        "その人はあなたとの会話中、よく目を見て話してくれる",
-        "その人はあなたからの連絡に比較的早く返事をしてくれる",
-        "その人はあなたと二人きりになる機会を作ろうとしている",
-        "その人はあなたの話をよく覚えていて、後日それについて触れてくれる",
-        "その人はあなたのことを友人や知人に話したことがある",
-        "その人はあなたの外見や持ち物について褒めてくれることがある",
-        "その人はあなたが困っているときに、積極的に助けてくれる",
-        "その人はあなたの冗談やユーモアに対して、よく笑ってくれる",
-        "その人はあなたと過ごす時間を大切にしているような態度を示す",
-        "その人はあなたの将来の予定や計画について関心を示してくれる"
-    ]
-    
-    // スマホ脳チェックの質問リスト
-    private let smartphoneBrainQuestions = [
-        "スマートフォンを触っていないと落ち着かない",
-        "スマートフォンの通知音が聞こえると、すぐに確認してしまう",
-        "食事中や人と話している時にもスマートフォンを見てしまう",
-        "寝る前にスマートフォンを見る習慣がある",
-        "スマートフォンを忘れると不安になる",
-        "集中したい時でもスマートフォンが気になってしまう",
-        "1日のスマートフォン使用時間が3時間以上である",
-        "スマートフォンを見ながら歩くことがある",
-        "SNSを頻繁にチェックしてしまう",
-        "スマートフォンの使用を減らそうと思っても難しい",
-        "スマートフォンが原因で睡眠不足になることがある",
-        "スマートフォンを見た後、目の疲れや頭痛を感じることがある"
-    ]
-    
-    // ストレスチェックの質問リスト
-    private let stressCheckQuestions = [
-        "活気がわいてくる",
-        "元気がいっぱいだ",
-        "生き生きする",
-        "怒りを感じる",
-        "内心腹立たしい",
-        "イライラしている",
-        "ひどく疲れた",
-        "へとへとだ",
-        "だるい",
-        "気がはりつめている",
-        "不安だ",
-        "落ち着かない",
-        "ゆううつだ",
-        "何をするのも面倒だ",
-        "物事に集中できない",
-        "気分が晴れない",
-        "仕事が手につかない",
-        "悲しいと感じる",
-        "めまいがする",
-        "体のふしぶしが痛む"
-    ]
-    
-    // 一般的なテストの回答選択肢（例: "全くない"〜"ほぼ毎日"）
-    private let answerOptions = ["全くない", "数日", "半分以上", "ほぼ毎日"]
-    // 恋愛関連テストの回答選択肢（例: "全くない"〜"いつも"）
-    private let loveAnswerOptions = ["全くない", "たまに", "よくある", "いつも"]
-    // K6, K10テストの回答選択肢（例: "全くない"〜"いつも"）
-    private let k6k10Options = ["全くない", "少しだけ", "時々", "たいてい", "いつも"]
-    // スマホ脳チェックの回答選択肢（例: "全くない"〜"いつも"）
-    private let smartphoneOptions = ["全くない", "たまに", "よく", "いつも"]
-    // ストレスチェックの回答選択肢（例: "そうだ"〜"違う"）
-    private let stressOptions = ["そうだ", "まあそうだ", "やや違う", "違う"]
     
     // ビューの本体
     var body: some View {
@@ -406,12 +176,9 @@ struct MentalHealthCheckView: View {
         safetySaveError = false
 
         if saveSafetyCheck {
-            let record = LightSafetyCheckRecord()
-            context.insert(record)
             do {
-                try context.save()
+                _ = try SafetyCheckSaveService().saveCheckDate(in: context)
             } catch {
-                context.delete(record)
                 safetySaveError = true
                 return
             }
@@ -488,7 +255,7 @@ struct MentalHealthCheckView: View {
     
     // カテゴリごとのテストカードセクションを生成するヘルパー関数
     @ViewBuilder
-    private func categorySection(title: String, tests: [TestType]) -> some View {
+    private func categorySection(title: String, tests: [SelfCheckType]) -> some View {
         // カテゴリセクションの垂直スタック
         VStack(alignment: .leading, spacing: 16) {
             // カテゴリタイトルとアイコン
@@ -772,39 +539,17 @@ struct MentalHealthCheckView: View {
     }
     
     // 現在のテストタイプに応じて、画面に表示する指示テキストを取得する関数
-    private func getInstructionText(for testType: TestType) -> String {
-        switch testType {
-        case .phq9, .gad7: // PHQ-9とGAD-7の場合
-            return "過去2週間で、以下の問題にどのくらい悩まされましたか？"
-        case .k6, .k10: // K6とK10の場合
-            return "過去30日間で、以下のことがどのくらいありましたか？"
-        case .mutualLove: // 両思い診断の場合
-            return "その人（特別な人）との関係について、以下の項目がどのくらい当てはまりますか？"
-        case .romanticSign: // 脈あり診断の場合
-            return "その人（気になる人）の行動や態度について、以下の項目がどのくらい当てはまりますか？"
-        case .smartphoneBrain: // スマホ脳チェックの場合
-            return "スマートフォンの使用について、以下の項目がどのくらい当てはまりますか？"
-        case .stressCheck: // ストレスチェックの場合
-            return "最近1ヶ月間のあなたの状態について、以下の項目がどのくらい当てはまりますか？"
-        }
+    private func getInstructionText(for testType: SelfCheckType) -> String {
+        SelfCheckCatalog.instruction(for: testType)
     }
     
     // 現在のテストタイプに応じて、質問リストを取得する関数
-    private func getQuestions(for testType: TestType) -> [String] {
-        switch testType {
-        case .phq9: return phq9Questions
-        case .gad7: return gad7Questions
-        case .k6: return k6Questions
-        case .k10: return k10Questions
-        case .mutualLove: return mutualLoveQuestions
-        case .romanticSign: return romanticSignQuestions
-        case .smartphoneBrain: return smartphoneBrainQuestions
-        case .stressCheck: return stressCheckQuestions
-        }
+    private func getQuestions(for testType: SelfCheckType) -> [String] {
+        SelfCheckCatalog.questions(for: testType)
     }
     
     // 現在のテストタイプに応じて、回答配列を取得する関数
-    private func getAnswers(for testType: TestType) -> [Int] {
+    private func getAnswers(for testType: SelfCheckType) -> [Int] {
         switch testType {
         case .phq9: return phq9Answers
         case .gad7: return gad7Answers
@@ -818,18 +563,12 @@ struct MentalHealthCheckView: View {
     }
     
     // 現在のテストタイプに応じて、回答選択肢の配列を取得する関数
-    private func getAnswerOptions(for testType: TestType) -> [String] {
-        switch testType {
-        case .phq9, .gad7: return answerOptions // PHQ-9, GAD-7は共通の選択肢
-        case .k6, .k10: return k6k10Options // K6, K10は共通の選択肢
-        case .mutualLove, .romanticSign: return loveAnswerOptions // 恋愛系は共通の選択肢
-        case .smartphoneBrain: return smartphoneOptions // スマホ脳は独自の選択肢
-        case .stressCheck: return stressOptions // ストレスチェックは独自の選択肢
-        }
+    private func getAnswerOptions(for testType: SelfCheckType) -> [String] {
+        SelfCheckCatalog.answerOptions(for: testType)
     }
     
     // 指定されたテストタイプ、質問インデックス、選択されたスコアで回答を更新する関数
-    private func updateAnswer(for testType: TestType, index: Int, score: Int) {
+    private func updateAnswer(for testType: SelfCheckType, index: Int, score: Int) {
         switch testType {
         case .phq9:
             phq9Answers[index] = score // PHQ-9の該当インデックスの回答を更新
@@ -851,7 +590,7 @@ struct MentalHealthCheckView: View {
     }
     
     // 現在実行中のテストタイプを返す計算プロパティ
-    private var currentTest: TestType? {
+    private var currentTest: SelfCheckType? {
         // currentTestIndexがtestQueueの範囲内であれば、そのインデックスのテストタイプを返す
         guard currentTestIndex < testQueue.count else { return nil } // 範囲外ならnil
         return testQueue[currentTestIndex]
@@ -1125,55 +864,22 @@ struct MentalHealthCheckView: View {
     // 診断結果をSwiftDataに保存する関数
     private func saveAssessment() {
         assessmentSaveError = false
-        let assessment = MentalHealthAssessment() // 新しいMentalHealthAssessmentインスタンスを作成
-        // 選択されたテストの種類を文字列配列に変換して保存
-        assessment.selectedTests = selectedTests.map { $0.rawValue }
-        // 各テストが完了したかどうかを保存
-        assessment.isPhq9Completed = selectedTests.contains(.phq9)
-        assessment.isGad7Completed = selectedTests.contains(.gad7)
-        
-        // 各テストが選択されている場合、そのスコアと回答を保存
-        if selectedTests.contains(.phq9) {
-            assessment.phq9Score = phq9Score // PHQ-9スコアを保存
-            assessment.phq9Answers = phq9Answers // PHQ-9回答を保存
-        }
-        
-        if selectedTests.contains(.gad7) {
-            assessment.gad7Score = gad7Score // GAD-7スコアを保存
-            assessment.gad7Answers = gad7Answers // GAD-7回答を保存
-        }
-        
-        // 各テストの結果をメモに追加（スコアと解釈結果）
-        if selectedTests.contains(.k6) {
-            assessment.notes += "K6スコア: \(k6Score)/24 (\(k6Interpretation))\n"
-        }
-        
-        if selectedTests.contains(.k10) {
-            assessment.notes += "K10スコア: \(k10Score)/40 (\(k10Interpretation))\n"
-        }
-        
-        if selectedTests.contains(.mutualLove) {
-            assessment.notes += "関係性の振り返りスコア: \(mutualLoveScore)/40 (\(mutualLoveInterpretation))\n"
-        }
-        
-        if selectedTests.contains(.romanticSign) {
-            assessment.notes += "やりとりの振り返りスコア: \(romanticSignScore)/40 (\(romanticSignInterpretation))\n"
-        }
-        
-        if selectedTests.contains(.smartphoneBrain) {
-            assessment.notes += "スマホとの付き合い方の振り返り: \(smartphoneBrainScore)/48 (\(smartphoneBrainInterpretation))\n"
-        }
-        
-        if selectedTests.contains(.stressCheck) {
-            assessment.notes += "ストレスの振り返り: \(stressCheckScore)/80 (\(stressCheckInterpretation))\n"
-        }
-        
-        context.insert(assessment) // 作成したassessmentオブジェクトをSwiftDataコンテキストに挿入
+        let draft = SelfCheckResultDraft(
+            selectedTests: selectedTests,
+            phq9Answers: phq9Answers,
+            gad7Answers: gad7Answers,
+            k6Answers: k6Answers,
+            k10Answers: k10Answers,
+            mutualLoveAnswers: mutualLoveAnswers,
+            romanticSignAnswers: romanticSignAnswers,
+            smartphoneBrainAnswers: smartphoneBrainAnswers,
+            stressCheckAnswers: stressCheckAnswers
+        )
+
         do {
-            try context.save() // コンテキストの変更をデータベースに保存
+            _ = try MentalHealthAssessmentSaveService().save(draft: draft, in: context)
         } catch {
-            // 未保存オブジェクトを残さず、入力済みの回答はStateに保持して再試行できるようにする。
-            context.delete(assessment)
+            // 保存に失敗しても回答配列はViewのStateに残るため、再試行できる。
             assessmentSaveError = true
         }
     }
@@ -1181,7 +887,7 @@ struct MentalHealthCheckView: View {
 
 // テスト選択カードのカスタムビュー
 struct TestSelectionCard: View {
-    let testType: MentalHealthCheckView.TestType // 表示するテストの種類
+    let testType: SelfCheckType // 表示するテストの種類
     let isSelected: Bool // 選択されているかどうかの状態
     let onTap: () -> Void // タップされた時のアクション
     
