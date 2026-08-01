@@ -25,6 +25,9 @@ final class SelfCheckDefinitionTests: XCTestCase {
     }
 
     func testStandardizedChecksRemainUnavailableUntilVerification() {
+        for type in SelfCheckType.allCases {
+            XCTAssertFalse(type.definition.sourceStatus.isEmpty)
+        }
         XCTAssertFalse(SelfCheckType.phq9.definition.availability.isAvailable)
         XCTAssertFalse(SelfCheckType.gad7.definition.availability.isAvailable)
         XCTAssertTrue(SelfCheckType.mutualLove.definition.availability.isAvailable)

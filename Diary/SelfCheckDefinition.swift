@@ -15,6 +15,12 @@ enum SelfCheckType: String, CaseIterable, Hashable {
     case smartphoneBrain = "スマホとの付き合い方を振り返る"
     case stressCheck = "職場向けストレスチェック（停止中）"
 
+    static let guidedReflectionTypes: [SelfCheckType] = [
+        .mutualLove,
+        .romanticSign,
+        .smartphoneBrain
+    ]
+
     var displayName: String {
         switch self {
         case .phq9: return "抑うつ症状チェック（PHQ-9）"
