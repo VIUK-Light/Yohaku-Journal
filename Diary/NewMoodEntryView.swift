@@ -767,7 +767,11 @@ private struct MoodInputRail: View {
                                 .frame(maxWidth: .infinity, minHeight: 56)
                             }
                             .buttonStyle(.plain)
+                            .frame(minWidth: 44, minHeight: 56)
+                            .focusable(true)
                             .accessibilityLabel("\(value) \(labels[value - 1])")
+                            .accessibilityValue(isSelected ? "選択中" : "未選択")
+                            .accessibilityIdentifier("mood-\(value)")
                             .accessibilityAddTraits(isSelected ? .isSelected : [])
                         }
                     }
