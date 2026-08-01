@@ -49,7 +49,6 @@ struct MoodEntryRow: View {
     private func timeString(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
-        formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
         formatter.dateFormat = "HH:mm"
         return formatter.string(from: date)
     }

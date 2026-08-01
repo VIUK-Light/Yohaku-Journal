@@ -639,7 +639,6 @@ struct NewMoodEntryView: View {
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ja_JP")
-        formatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
         formatter.dateFormat = "yyyy年M月d日（E） HH:mm"
         return formatter.string(from: date)
     }
