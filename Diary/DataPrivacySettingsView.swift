@@ -235,13 +235,17 @@ struct DataPrivacySettingsView: View {
     }
 
     private func beginBackup() {
+        guard !isWorking else { return }
         isWorking = true
-        defer { isWorking = false }
-        do {
-            let archive = try DiaryArchiveDataService.makeArchive(in: modelContext)
-            pendingBackup = PendingBackup(archive: archive)
-        } catch {
-            showError(title: "バックアップを準備できませんでした", error: error)
+        Task { @MainActor in
+            await Task.yield()
+            defer { isWorking = false }
+            do {
+                let archive = try DiaryArchiveDataService.makeArchive(in: modelContext)
+                pendingBackup = PendingBackup(archive: archive)
+            } catch {
+                showError(title: "バックアップを準備できませんでした", error: error)
+            }
         }
     }
 
@@ -310,43 +314,49 @@ struct DataPrivacySettingsView: View {
         _ archive: DiaryArchiveV1,
         policy: RestoreConflictPolicy
     ) -> Bool {
+        guard !isWorking else { return false }
         isWorking = true
-        defer { isWorking = false }
-        do {
-            let result = try DiaryArchiveDataService.restore(
-                archive: archive,
-                conflictPolicy: policy,
-                in: modelContext
-            )
-            pendingRestore = nil
-            refreshCounts()
-            notice = DataManagementNotice(
-                title: "復元しました",
-                message: "追加 \(result.inserted.total)件、置換 \(result.replaced.total)件。"
-            )
-            return true
-        } catch {
-            showError(title: "復元できませんでした", error: error)
-            return false
+        Task { @MainActor in
+            await Task.yield()
+            defer { isWorking = false }
+            do {
+                let result = try DiaryArchiveDataService.restore(
+                    archive: archive,
+                    conflictPolicy: policy,
+                    in: modelContext
+                )
+                pendingRestore = nil
+                refreshCounts()
+                notice = DataManagementNotice(
+                    title: "復元しました",
+                    message: "追加 \(result.inserted.total)件、置換 \(result.replaced.total)件。"
+                )
+            } catch {
+                showError(title: "復元できませんでした", error: error)
+            }
         }
+        return false
     }
 
     private func performFullDeletion() -> Bool {
+        guard !isWorking else { return false }
         isWorking = true
-        defer { isWorking = false }
-        do {
-            let deleted = try DiaryArchiveDataService.deleteAll(in: modelContext)
-            isShowingDeletion = false
-            refreshCounts()
-            notice = DataManagementNotice(
-                title: "記録を削除しました",
-                message: "端末内の記録 \(deleted.total)件を削除しました。"
-            )
-            return true
-        } catch {
-            showError(title: "削除できませんでした", error: error)
-            return false
+        Task { @MainActor in
+            await Task.yield()
+            defer { isWorking = false }
+            do {
+                let deleted = try DiaryArchiveDataService.deleteAll(in: modelContext)
+                isShowingDeletion = false
+                refreshCounts()
+                notice = DataManagementNotice(
+                    title: "記録を削除しました",
+                    message: "端末内の記録 \(deleted.total)件を削除しました。"
+                )
+            } catch {
+                showError(title: "削除できませんでした", error: error)
+            }
         }
+        return false
     }
 
     private func refreshCounts() {
