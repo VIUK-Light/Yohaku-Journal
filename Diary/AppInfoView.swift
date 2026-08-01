@@ -10,6 +10,7 @@ struct AppInfoView: View {
     private var safetyRecords: [LightSafetyCheckRecord]
     @State private var showingSafetyRecordDeletion = false
     @State private var showingSafetyRecordError = false
+    @State private var showingSupportResources = false
 
     var body: some View {
         NavigationStack {
@@ -114,22 +115,19 @@ struct AppInfoView: View {
                 .foregroundStyle(DiaryTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            SupportLink(
-                title: "こころの健康相談統一ダイヤル",
-                subtitle: "0570-064-556",
-                description: "地域の公的な心の健康相談窓口につながります。",
-                destination: URL(string: "tel:0570064556")!
-            )
+            Button {
+                showingSupportResources = true
+            } label: {
+                Label("相談先を開く", systemImage: "person.2")
+            }
+            .foregroundStyle(DiaryTheme.accent)
 
-            SupportLink(
-                title: "よりそいホットライン",
-                subtitle: "0120-279-338",
-                description: "さまざまな悩みを相談できる窓口です。",
-                destination: URL(string: "tel:0120279338")!
-            )
-
-            Link("厚生労働省の相談先一覧を見る", destination: URL(string: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/")!)
-                .font(.subheadline.weight(.semibold))
+            Text("窓口の選択と公式出典の確認を、共通の相談先画面にまとめています。受付時間や接続条件は変わることがあります。")
+                .font(.caption)
+                .foregroundStyle(DiaryTheme.muted)
+        }
+        .sheet(isPresented: $showingSupportResources) {
+            SupportResourcesView()
         }
     }
 
@@ -242,30 +240,5 @@ private struct InfoRow: View {
             }
         }
         .padding(.vertical, 3)
-    }
-}
-
-private struct SupportLink: View {
-    let title: String
-    let subtitle: String
-    let description: String
-    let destination: URL
-
-    var body: some View {
-        Link(destination: destination) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-
-                Text(subtitle)
-                    .font(.headline.monospacedDigit())
-
-                Text(description)
-                    .font(.caption)
-                    .foregroundStyle(DiaryTheme.muted)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 3)
-        }
     }
 }

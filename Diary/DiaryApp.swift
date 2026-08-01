@@ -90,6 +90,7 @@ extension View {
 
 @main
 struct ScienceClubDiaryApp: App {
+    @AppStorage("hasCompletedLightIntroduction") private var hasCompletedLightIntroduction = false
     @StateObject private var lockController: AppLockController
     @StateObject private var protectionStatus: DiaryDataProtectionStatus
 
@@ -153,12 +154,18 @@ struct ScienceClubDiaryApp: App {
             PrivacyProtectedRootView(lockController: lockController) {
                 if let modelContainer {
                     Group {
-                        MoodJournalView()
-                            .tint(DiaryTheme.accent)
-#if targetEnvironment(macCatalyst)
-                            .background(MacWindowConfigurator())
-#endif
+                        if hasCompletedLightIntroduction {
+                            MoodJournalView()
+                        } else {
+                            LightIntroductionView {
+                                hasCompletedLightIntroduction = true
+                            }
+                        }
                     }
+                    .tint(DiaryTheme.accent)
+#if targetEnvironment(macCatalyst)
+                    .background(MacWindowConfigurator())
+#endif
                     .environmentObject(lockController)
                     .environmentObject(protectionStatus)
                     .modelContainer(modelContainer)

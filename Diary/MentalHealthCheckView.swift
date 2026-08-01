@@ -364,7 +364,7 @@ struct MentalHealthCheckView: View {
                         .buttonStyle(.borderedProminent)
 
                         if showingSupportResources {
-                            ConsultationResourcesView()
+                            CompactSupportResourcesView()
                         }
                     }
                     .padding()
@@ -736,7 +736,7 @@ struct MentalHealthCheckView: View {
                 // メンタルヘルス関連のテストが選択されている場合に相談窓口を表示
                 if selectedTests.contains(.phq9) || selectedTests.contains(.gad7) ||
                    selectedTests.contains(.k6) || selectedTests.contains(.k10) {
-                    ConsultationResourcesView() // カスタムビュー: 相談窓口・リソース
+                    CompactSupportResourcesView()
                 }
                 
                 // 結果保存ボタンと新しいテスト開始ボタン
@@ -1552,34 +1552,6 @@ struct StressAdviceView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding()
         .background(Color.green.opacity(0.1)) // 背景色
-        .cornerRadius(12)
-    }
-}
-
-// 相談窓口やリソースのリンクを表示するビュー
-struct ConsultationResourcesView: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("相談先を知る")
-                .font(.headline.bold())
-
-            Text("地域や時間帯によってつながり方が異なることがあります。公式案内で最新情報を確認してください。")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            
-            Link("こころの健康相談統一ダイヤル（0570-064-556）", destination: URL(string: "tel:0570064556")!)
-                .foregroundColor(.blue)
-            
-            Link("厚生労働省の相談先一覧を見る", destination: URL(string: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/")!)
-                .foregroundColor(.blue)
-
-            Text("家族、担任の先生、スクールカウンセラー、保健室、信頼できる大人に声をかける方法もあります。今すぐ危険がある場合は119番、または近くの大人・救急外来へつないでください。")
-                .font(.caption)
-                .foregroundStyle(DiaryTheme.emergency)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.orange.opacity(0.1)) // 背景色
         .cornerRadius(12)
     }
 }
