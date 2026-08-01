@@ -167,7 +167,7 @@ struct DiaryLineIcon: View {
 
         guard rays else { return }
         for index in 0..<8 {
-            let angle = Double(index) * Double.pi / 4
+            let angle = CGFloat(index) * .pi / 4
             let inner = radius * 1.55
             let outer = radius * 2.15
             var ray = Path()
