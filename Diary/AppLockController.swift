@@ -168,7 +168,7 @@ final class AppLockController: ObservableObject {
     func authenticateForUnlock() async -> Bool {
         guard isEnabled else { return true }
         guard await authenticate(reason: "日記の記録を開きます。") else {
-            isPrivacyShieldVisible = false
+            isPrivacyShieldVisible = true
             isLocked = true
             return false
         }

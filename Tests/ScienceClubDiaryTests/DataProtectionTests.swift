@@ -473,6 +473,22 @@ final class AppLockControllerTests: XCTestCase {
         XCTAssertTrue(controller.isLocked)
         XCTAssertTrue(controller.isPrivacyShieldVisible)
     }
+
+    func testFailedUnlockKeepsPrivacyShieldVisible() async {
+        defaults.set(true, forKey: AppLockController.defaultsKey)
+        let controller = AppLockController(
+            defaults: defaults,
+            authenticationClient: DeviceOwnerAuthenticationClient { _ in
+                throw DeviceOwnerAuthenticationError.failed
+            }
+        )
+
+        let didUnlock = await controller.authenticateForUnlock()
+
+        XCTAssertFalse(didUnlock)
+        XCTAssertTrue(controller.isLocked)
+        XCTAssertTrue(controller.isPrivacyShieldVisible)
+    }
 }
 
 final class AppDataProtectionConfigurationTests: XCTestCase {
