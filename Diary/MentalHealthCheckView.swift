@@ -28,8 +28,9 @@ struct MentalHealthCheckView: View {
     @State private var stressCheckAnswers: [Int] = Array(repeating: -1, count: 20)
     // 自由記述のメモを保持する状態変数
     @State private var notes = ""
-    // セルフチェック開始前の安全確認。回答内容は保存しない。
-    @State private var safetyGateCompleted = false
+    // 危機項目を含む標準尺度を開始するときだけ表示する安全確認。
+    // 非臨床の振り返りでは回答を強制しない。回答内容は保存しない。
+    @State private var safetyGateCompleted = true
     @State private var safetyResponse: SafetyResponse?
     @State private var saveSafetyCheck = false
     @State private var showingSupportResources = false
@@ -185,6 +186,7 @@ struct MentalHealthCheckView: View {
         }
 
         safetyGateCompleted = true
+        beginSelectedTests()
     }
     
     // テスト選択画面のビュー（ScrollViewでスクロール可能）
@@ -525,8 +527,20 @@ struct MentalHealthCheckView: View {
         return time // 合計時間を返す
     }
     
-    // PHQ-9テストの合計スコアを計算する計算プロパティ
+    // 選択されたテストを開始する。危機項目を含む尺度だけ安全確認を先に表示する。
     private func startSelectedTests() {
+        if selectedTests.contains(where: \.requiresSafetyGate) {
+            safetyGateCompleted = false
+            safetyResponse = nil
+            showingSupportResources = false
+            safetySaveError = false
+            return
+        }
+
+        beginSelectedTests()
+    }
+
+    private func beginSelectedTests() {
         // 一時停止中のチェックが状態に残っていても、実行キューには入れない。
         testQueue = selectedTests.filter { !$0.isPaused }
         guard !testQueue.isEmpty else { return }
@@ -573,6 +587,11 @@ struct MentalHealthCheckView: View {
         smartphoneBrainAnswers = Array(repeating: -1, count: 12)
         stressCheckAnswers = Array(repeating: -1, count: 20)
         notes = "" // メモをクリア
+        safetyGateCompleted = true
+        safetyResponse = nil
+        showingSupportResources = false
+        saveSafetyCheck = false
+        safetySaveError = false
     }
     
     // 診断結果をSwiftDataに保存する関数

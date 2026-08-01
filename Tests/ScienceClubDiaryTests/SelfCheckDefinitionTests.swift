@@ -34,6 +34,17 @@ final class SelfCheckDefinitionTests: XCTestCase {
         XCTAssertEqual(SelfCheckType.mutualLove.definition.evidenceLevel, .guidedReflection)
     }
 
+    func testOnlyChecksWithCrisisItemsRequireSafetyGate() {
+        XCTAssertTrue(SelfCheckType.phq9.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.gad7.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.k6.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.k10.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.mutualLove.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.romanticSign.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.smartphoneBrain.requiresSafetyGate)
+        XCTAssertFalse(SelfCheckType.stressCheck.requiresSafetyGate)
+    }
+
     func testSessionProducesFactualResponseCountsWithoutSeverity() {
         let session = SelfCheckSession(
             type: .smartphoneBrain,
