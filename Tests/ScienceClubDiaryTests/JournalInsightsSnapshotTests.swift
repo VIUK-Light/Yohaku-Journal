@@ -1,0 +1,65 @@
+import Foundation
+import XCTest
+@testable import Science_Club_Diary
+
+final class JournalInsightsSnapshotTests: XCTestCase {
+    private let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return calendar
+    }()
+
+    func testSmallEventSamplesDoNotReceiveAnAverage() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let entries = [
+            makeEntry(date: now, score: 2, tag: "家族"),
+            makeEntry(date: now.addingTimeInterval(-60), score: 6, tag: "家族"),
+            makeEntry(date: now.addingTimeInterval(-120), score: 4, tag: "学校"),
+            makeEntry(date: now.addingTimeInterval(-180), score: 5, tag: "学校"),
+            makeEntry(date: now.addingTimeInterval(-240), score: 6, tag: "学校")
+        ]
+
+        let snapshot = JournalInsightsCalculator.make(
+            entries: entries,
+            range: .all,
+            now: now,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(snapshot.totalEntries, 5)
+        XCTAssertEqual(snapshot.eventTagTypeCount, 2)
+        XCTAssertNil(snapshot.eventBreakdowns.first { $0.name == "家族" }?.averageMood)
+        XCTAssertEqual(snapshot.eventBreakdowns.first { $0.name == "学校" }?.averageMood, 5)
+    }
+
+    func testInsightsKeepOnlyTopEightEventTags() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let entries = (1...10).map { index in
+            makeEntry(
+                date: now.addingTimeInterval(TimeInterval(-index * 60)),
+                score: 4,
+                tag: "タグ\(index)"
+            )
+        }
+
+        let snapshot = JournalInsightsCalculator.make(
+            entries: entries,
+            range: .all,
+            now: now,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(snapshot.eventTagTypeCount, 10)
+        XCTAssertEqual(snapshot.eventBreakdowns.count, 8)
+        XCTAssertEqual(snapshot.omittedEventTagCount, 2)
+    }
+
+    private func makeEntry(date: Date, score: Int, tag: String) -> MoodEntry {
+        let entry = MoodEntry()
+        entry.date = date
+        entry.moodScore = score
+        entry.mood = "気分\(score)"
+        entry.influences = [tag]
+        return entry
+    }
+}
