@@ -29,15 +29,19 @@
 		62A7548D2D916C76230DDD9B /* JournalRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CDD149CF611554A8314B4C /* JournalRecordView.swift */; };
 		64FB40F09C803AC65FF37649 /* DataPrivacySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418D76658E5C97DC3A74994C /* DataPrivacySettingsView.swift */; };
 		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
+		75BCDC536D32E3D3CFDECBCC /* SelfCheckDefinition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15E1EC3B2579EC051B3A25F /* SelfCheckDefinition.swift */; };
 		7B5FC189065F27EF266D5FA7 /* LightIntroductionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A4E1E111F27ECD99ECBD5A /* LightIntroductionView.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		827E8964EDF0CC0608063A65 /* SafetyCheckPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87E1EFCF430E699B30EFD918 /* SafetyCheckPersistence.swift */; };
 		AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */; };
 		AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */; };
 		B58896F34741D464B7B41717 /* JournalTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17495CDEA94E8866453E0700 /* JournalTimeline.swift */; };
 		C29FA6325E9771B0C4116DDB /* DiaryArchiveCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E2903BD3825A4EF44B72B2 /* DiaryArchiveCrypto.swift */; };
 		C53A79F6835D05DC3AF9FDE3 /* JournalInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */; };
+		D7DE643C163C3BF78A6EABFB /* SelfCheckDefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F7A0E8CDED397DF2E5ED10 /* SelfCheckDefinitionTests.swift */; };
 		DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */; };
 		E78AA777ECAA7C31640A0C4A /* SupportResourcesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E019B526858A3FC6A1A96E13 /* SupportResourcesView.swift */; };
+		F506CA63349371939BC8FFF0 /* SelfCheckEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 46062127FCC4D4FF7BE17066 /* SelfCheckEvidence.swift */; };
 		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,9 +62,11 @@
 		17495CDEA94E8866453E0700 /* JournalTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimeline.swift; sourceTree = "<group>"; };
 		1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsSnapshotTests.swift; sourceTree = "<group>"; };
 		295CD016C5E79DEC0FEA32C7 /* SupportResourceCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportResourceCatalogTests.swift; sourceTree = "<group>"; };
+		30F7A0E8CDED397DF2E5ED10 /* SelfCheckDefinitionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheckDefinitionTests.swift; sourceTree = "<group>"; };
 		3115FFDFC83C98AD90565965 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
 		35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryLineIcon.swift; sourceTree = "<group>"; };
 		418D76658E5C97DC3A74994C /* DataPrivacySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPrivacySettingsView.swift; sourceTree = "<group>"; };
+		46062127FCC4D4FF7BE17066 /* SelfCheckEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheckEvidence.swift; sourceTree = "<group>"; };
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
 		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
 		55EB4A38A635C50B095AE7AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -71,6 +77,7 @@
 		7DC6ACD722F54642C2A7AD78 /* AppLockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockController.swift; sourceTree = "<group>"; };
 		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
 		86005C9E1A4F5E4ED1DAD1CE /* DataProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProtectionTests.swift; sourceTree = "<group>"; };
+		87E1EFCF430E699B30EFD918 /* SafetyCheckPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafetyCheckPersistence.swift; sourceTree = "<group>"; };
 		8ECE76C81883ED0739846B7B /* Science Club DiaryTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Science Club DiaryTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryPersistenceTests.swift; sourceTree = "<group>"; };
 		9B7674FA667D8FF29B01AF59 /* RecordKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordKind.swift; sourceTree = "<group>"; };
@@ -86,6 +93,7 @@
 		E019B526858A3FC6A1A96E13 /* SupportResourcesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportResourcesView.swift; sourceTree = "<group>"; };
 		E3602C212FA0CF313F99C3FE /* DiaryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryApp.swift; sourceTree = "<group>"; };
 		E9CDD149CF611554A8314B4C /* JournalRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalRecordView.swift; sourceTree = "<group>"; };
+		F15E1EC3B2579EC051B3A25F /* SelfCheckDefinition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheckDefinition.swift; sourceTree = "<group>"; };
 		FFB67B6060F19002D6ACE327 /* ArticleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,7 +134,10 @@
 				6284A7417F6F4E775C212446 /* MoodJournalView.swift */,
 				DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */,
 				9B7674FA667D8FF29B01AF59 /* RecordKind.swift */,
+				87E1EFCF430E699B30EFD918 /* SafetyCheckPersistence.swift */,
 				84991957D3523758A1F8DA62 /* SelectableButton.swift */,
+				F15E1EC3B2579EC051B3A25F /* SelfCheckDefinition.swift */,
+				46062127FCC4D4FF7BE17066 /* SelfCheckEvidence.swift */,
 				1654BE2A94C81476A308C486 /* SupportResource.swift */,
 				E019B526858A3FC6A1A96E13 /* SupportResourcesView.swift */,
 			);
@@ -140,6 +151,7 @@
 				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
 				1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */,
 				C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */,
+				30F7A0E8CDED397DF2E5ED10 /* SelfCheckDefinitionTests.swift */,
 				295CD016C5E79DEC0FEA32C7 /* SupportResourceCatalogTests.swift */,
 			);
 			path = ScienceClubDiaryTests;
@@ -264,7 +276,10 @@
 				2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */,
 				20CB64F5B4A12278AA6DD7E2 /* NewMoodEntryView.swift in Sources */,
 				283755B4C7F0EEE7E5C3BB7C /* RecordKind.swift in Sources */,
+				827E8964EDF0CC0608063A65 /* SafetyCheckPersistence.swift in Sources */,
 				80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */,
+				75BCDC536D32E3D3CFDECBCC /* SelfCheckDefinition.swift in Sources */,
+				F506CA63349371939BC8FFF0 /* SelfCheckEvidence.swift in Sources */,
 				54BCD61503805C9592AD2752 /* SupportResource.swift in Sources */,
 				E78AA777ECAA7C31640A0C4A /* SupportResourcesView.swift in Sources */,
 			);
@@ -278,6 +293,7 @@
 				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
 				AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */,
 				AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */,
+				D7DE643C163C3BF78A6EABFB /* SelfCheckDefinitionTests.swift in Sources */,
 				4E05E918340EAAC993A9D56C /* SupportResourceCatalogTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
