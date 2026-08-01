@@ -67,6 +67,11 @@ struct SelectableButton: View {
                         .stroke(isSelected ? backgroundColor : DiaryTheme.line, lineWidth: isSelected ? 2 : 1)
                 )
         }
+        .frame(minWidth: 44, minHeight: 44)
+        .focusable(true)
+        .accessibilityLabel(label)
+        .accessibilityValue(isSelected ? "選択中" : "未選択")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
         // 選択時はわずかに拡大して強調
         .scaleEffect(isSelected ? 1.05 : 1)
         // isSelected の変化に合わせてアニメーション
