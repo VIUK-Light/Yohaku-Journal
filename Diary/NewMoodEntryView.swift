@@ -697,32 +697,26 @@ struct NewMoodEntryView: View {
         focusedField = nil
         isSaving = true
 
-        let entry = entryToEdit ?? MoodEntry()
-        entry.recordType = selectedRecordType
-        entry.mood = moodLabels[selectedMoodScore - 1]
-        entry.moodScore = selectedMoodScore
-        entry.emotions = selectedEmotions.sorted()
-        entry.influences = selectedInfluences.sorted()
-        entry.lifeFactors = selectedLifeFactors.sorted()
-        entry.notes = notes.trimmingCharacters(in: .whitespacesAndNewlines)
-        entry.activities = activities.sorted()
-        entry.gratitude = gratitude.trimmingCharacters(in: .whitespacesAndNewlines)
-        entry.reflections = reflections.trimmingCharacters(in: .whitespacesAndNewlines)
-        if entryToEdit == nil {
-            entry.date = Date()
-            context.insert(entry)
-        }
-
         do {
-            try context.save()
-            onSave(entry)
+            let draft = JournalEntryDraft(
+                recordType: selectedRecordType,
+                mood: moodLabels[selectedMoodScore - 1],
+                moodScore: selectedMoodScore,
+                emotions: selectedEmotions.sorted(),
+                influences: selectedInfluences.sorted(),
+                lifeFactors: selectedLifeFactors.sorted(),
+                notes: notes,
+                activities: activities.sorted(),
+                gratitude: gratitude,
+                reflections: reflections
+            )
+            let savedEntry = try MoodEntrySaveService.save(
+                draft: draft,
+                editing: entryToEdit,
+                in: context
+            )
+            onSave(savedEntry)
         } catch {
-            if entryToEdit == nil {
-                context.delete(entry)
-            } else {
-                // 編集途中の変更を保存できなかった場合は、編集前の状態に戻す。
-                context.rollback()
-            }
             isSaving = false
             saveErrorMessage = error.localizedDescription
             showingSaveError = true
