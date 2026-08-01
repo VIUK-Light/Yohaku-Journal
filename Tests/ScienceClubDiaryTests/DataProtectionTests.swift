@@ -243,6 +243,29 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         }
     }
 
+    func testCancellationPreventsDecryptionResult() async throws {
+        let gate = EncryptionStartGate()
+        let operation = Task.detached(priority: .userInitiated) {
+            await gate.wait()
+            return try await DiaryArchiveCrypto.decrypt(
+                encryptedData: Data(),
+                password: "short"
+            )
+        }
+
+        operation.cancel()
+        await gate.open()
+
+        do {
+            _ = try await operation.value
+            XCTFail("キャンセル済みの復号結果が返ってはいけません")
+        } catch is CancellationError {
+            // 期待するキャンセル結果。
+        } catch {
+            XCTFail("想定外のエラー: \(error)")
+        }
+    }
+
     func testVisuallyEquivalentCanonicalPasswordsDeriveSameKey() throws {
         let composed = "café password phrase"
         let decomposed = "cafe\u{301} password phrase"

@@ -318,8 +318,8 @@ struct DataPrivacySettingsView: View {
     private func performRestore(
         _ archive: DiaryArchiveV1,
         policy: RestoreConflictPolicy
-    ) -> Bool {
-        guard !isWorking else { return false }
+    ) {
+        guard !isWorking else { return }
         isWorking = true
         workMessage = "記録を復元しています…"
         Task { @MainActor in
@@ -341,11 +341,10 @@ struct DataPrivacySettingsView: View {
                 showError(title: "復元できませんでした", error: error)
             }
         }
-        return false
     }
 
-    private func performFullDeletion() -> Bool {
-        guard !isWorking else { return false }
+    private func performFullDeletion() {
+        guard !isWorking else { return }
         isWorking = true
         workMessage = "記録を削除しています…"
         Task { @MainActor in
@@ -363,7 +362,6 @@ struct DataPrivacySettingsView: View {
                 showError(title: "削除できませんでした", error: error)
             }
         }
-        return false
     }
 
     private func refreshCounts() {
@@ -622,7 +620,7 @@ private struct RestorePasswordSheet: View {
 private struct RestorePreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
     let item: PendingRestore
-    let onRestore: (RestoreConflictPolicy) -> Bool
+    let onRestore: (RestoreConflictPolicy) -> Void
 
     @State private var policy: RestoreConflictPolicy = .keepCurrent
 
@@ -657,9 +655,7 @@ private struct RestorePreviewSheet: View {
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("復元") {
-                        if onRestore(policy) {
-                            dismiss()
-                        }
+                        onRestore(policy)
                     }
                 }
             }
@@ -680,7 +676,7 @@ private struct RestorePreviewSheet: View {
 private struct FullDataDeletionSheet: View {
     @Environment(\.dismiss) private var dismiss
     let counts: DiaryDataCounts
-    let onDelete: () -> Bool
+    let onDelete: () -> Void
 
     @State private var isFinalStep = false
     @State private var confirmationText = ""
@@ -717,9 +713,7 @@ private struct FullDataDeletionSheet: View {
                 ToolbarItem(placement: .confirmationAction) {
                     if isFinalStep {
                         Button("完全に削除", role: .destructive) {
-                            if onDelete() {
-                                dismiss()
-                            }
+                            onDelete()
                         }
                         .disabled(confirmationText != "削除する")
                     } else {

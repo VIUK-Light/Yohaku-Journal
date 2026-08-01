@@ -58,19 +58,34 @@ enum DiaryArchiveDataService {
     ) throws -> DiaryArchiveRestorePreview {
         try archive.validate()
         let localMoodIDs = try fetchMatchingIDs(
-            descriptor: FetchDescriptor<MoodEntry>(),
+            descriptor: FetchDescriptor<MoodEntry>(
+                sortBy: [
+                    SortDescriptor(\MoodEntry.date, order: .forward),
+                    SortDescriptor(\MoodEntry.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.moodEntries.map(\.id)),
             id: \MoodEntry.id,
             in: context
         )
         let localAssessmentIDs = try fetchMatchingIDs(
-            descriptor: FetchDescriptor<MentalHealthAssessment>(),
+            descriptor: FetchDescriptor<MentalHealthAssessment>(
+                sortBy: [
+                    SortDescriptor(\MentalHealthAssessment.date, order: .forward),
+                    SortDescriptor(\MentalHealthAssessment.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.assessments.map(\.id)),
             id: \MentalHealthAssessment.id,
             in: context
         )
         let localSafetyIDs = try fetchMatchingIDs(
-            descriptor: FetchDescriptor<LightSafetyCheckRecord>(),
+            descriptor: FetchDescriptor<LightSafetyCheckRecord>(
+                sortBy: [
+                    SortDescriptor(\LightSafetyCheckRecord.date, order: .forward),
+                    SortDescriptor(\LightSafetyCheckRecord.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.safetyChecks.map(\.id)),
             id: \LightSafetyCheckRecord.id,
             in: context
@@ -98,19 +113,34 @@ enum DiaryArchiveDataService {
         }
 
         let moodByID = try fetchMatchingModels(
-            descriptor: FetchDescriptor<MoodEntry>(),
+            descriptor: FetchDescriptor<MoodEntry>(
+                sortBy: [
+                    SortDescriptor(\MoodEntry.date, order: .forward),
+                    SortDescriptor(\MoodEntry.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.moodEntries.map(\.id)),
             id: \MoodEntry.id,
             in: context
         )
         let assessmentByID = try fetchMatchingModels(
-            descriptor: FetchDescriptor<MentalHealthAssessment>(),
+            descriptor: FetchDescriptor<MentalHealthAssessment>(
+                sortBy: [
+                    SortDescriptor(\MentalHealthAssessment.date, order: .forward),
+                    SortDescriptor(\MentalHealthAssessment.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.assessments.map(\.id)),
             id: \MentalHealthAssessment.id,
             in: context
         )
         let safetyByID = try fetchMatchingModels(
-            descriptor: FetchDescriptor<LightSafetyCheckRecord>(),
+            descriptor: FetchDescriptor<LightSafetyCheckRecord>(
+                sortBy: [
+                    SortDescriptor(\LightSafetyCheckRecord.date, order: .forward),
+                    SortDescriptor(\LightSafetyCheckRecord.id, order: .forward)
+                ]
+            ),
             requestedIDs: Set(archive.safetyChecks.map(\.id)),
             id: \LightSafetyCheckRecord.id,
             in: context
