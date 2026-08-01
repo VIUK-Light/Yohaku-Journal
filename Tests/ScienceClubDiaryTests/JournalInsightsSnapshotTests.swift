@@ -99,6 +99,26 @@ final class JournalInsightsSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.eventBreakdowns.first?.entryCount, 1)
     }
 
+    func testOutOfRangeMoodScoresDoNotAffectMoodAverages() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let valid = makeEntry(date: now, score: 6, tag: "学校")
+        let legacyInvalid = makeEntry(date: now.addingTimeInterval(-60), score: 99, tag: "学校")
+
+        let snapshot = JournalInsightsCalculator.make(
+            entries: [valid, legacyInvalid],
+            range: .all,
+            now: now,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(snapshot.totalEntries, 2)
+        XCTAssertEqual(snapshot.averageMood, 6)
+        XCTAssertEqual(snapshot.moodTrend.first?.averageScore, 6)
+        XCTAssertEqual(snapshot.moodTrend.first?.entryCount, 2)
+        XCTAssertNil(snapshot.eventBreakdowns.first?.averageMood)
+        XCTAssertEqual(snapshot.eventBreakdowns.first?.entryCount, 2)
+    }
+
     private func makeEntry(date: Date, score: Int, tag: String) -> MoodEntry {
         let entry = MoodEntry()
         entry.date = date
