@@ -21,7 +21,7 @@ enum SupportUrgency: Int, CaseIterable, Comparable {
     }
 }
 
-enum SupportContactKind: String {
+enum SupportContactKind: String, Equatable {
     case phone
     case web
 
@@ -141,6 +141,19 @@ enum SupportResourceCatalog {
             contactLabel: "厚生労働省の一覧を開く",
             contactKind: .web,
             destinationString: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/sns/",
+            sourceURLString: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/sns/",
+            urgency: .anytime,
+            lastVerified: lastVerified
+        ),
+        SupportResource(
+            id: "anata-no-ibasho",
+            name: "あなたのいばしょ",
+            summary: "年齢や性別を問わず、無料・匿名でチャット相談を利用できます。",
+            audience: "文字で、いつでも相談したい人",
+            availability: "24時間・365日",
+            contactLabel: "チャット相談を開く",
+            contactKind: .web,
+            destinationString: "https://talkme.jp/",
             sourceURLString: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/sns/",
             urgency: .anytime,
             lastVerified: lastVerified
