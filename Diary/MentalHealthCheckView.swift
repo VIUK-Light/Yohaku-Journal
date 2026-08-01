@@ -644,7 +644,7 @@ struct TestSelectionCard: View {
                         .foregroundColor(.secondary) // 二次テキストカラー
 
                     if testType.isPaused {
-                        Text("現在は利用できません")
+                        Text(testType.definition.availability.shortLabel)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(.secondary)
                     }
