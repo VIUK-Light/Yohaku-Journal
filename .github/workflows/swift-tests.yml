@@ -25,11 +25,13 @@ jobs:
         id: simulator
         shell: bash
         run: |
-          device_id="$(xcrun simctl list devices available -j | python3 -c '
+          device_id=$(python3 -c '
           import json
-          import sys
+          import subprocess
 
-          devices = json.load(sys.stdin).get("devices", {})
+          devices = json.loads(subprocess.check_output([
+              "xcrun", "simctl", "list", "devices", "available", "-j"
+          ])).get("devices", {})
           preferred = ("iPhone 17 Pro", "iPhone 17", "iPhone 16 Pro", "iPhone 16")
           for name in preferred:
               for runtime_devices in devices.values():
