@@ -48,4 +48,22 @@ final class SupportResourceCatalogTests: XCTestCase {
             "https://www.mhlw.go.jp/mamorouyokokoro/soudan/sns/"
         )
     }
+
+    func testNonClinicalReflectionsDoNotRequireSafetyGate() {
+        XCTAssertFalse(MentalHealthCheckView.TestType.mutualLove.requiresSafetyGate)
+        XCTAssertFalse(MentalHealthCheckView.TestType.romanticSign.requiresSafetyGate)
+        XCTAssertFalse(MentalHealthCheckView.TestType.smartphoneBrain.requiresSafetyGate)
+    }
+
+    func testStandardizedChecksRequireSafetyGateWhenReenabled() {
+        let standardizedChecks: [MentalHealthCheckView.TestType] = [
+            .phq9,
+            .gad7,
+            .k6,
+            .k10,
+            .stressCheck
+        ]
+
+        XCTAssertTrue(standardizedChecks.allSatisfy(\.requiresSafetyGate))
+    }
 }
