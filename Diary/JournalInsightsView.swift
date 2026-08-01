@@ -130,6 +130,30 @@ struct JournalInsightsView: View {
                 .overlay { RoundedRectangle(cornerRadius: 18, style: .continuous).stroke(DiaryTheme.line) }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(moodTrendSummary)
+
+                DisclosureGroup("日ごとの数値") {
+                    VStack(spacing: 0) {
+                        ForEach(snapshot.moodTrend) { point in
+                            HStack(spacing: 12) {
+                                Text(dateString(point.date))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                Text("平均 \(formatted(point.averageScore))")
+                                    .monospacedDigit()
+                                Text(entryCountLabel(for: point))
+                                    .foregroundStyle(DiaryTheme.muted)
+                            }
+                            .font(.caption)
+                            .padding(.vertical, 8)
+                            if point.id != snapshot.moodTrend.last?.id { Divider() }
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 10)
+                .background(DiaryTheme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .overlay { RoundedRectangle(cornerRadius: 14, style: .continuous).stroke(DiaryTheme.line) }
+                .accessibilityElement(children: .contain)
             }
         }
     }
@@ -151,7 +175,7 @@ struct JournalInsightsView: View {
                                 .font(.subheadline.monospacedDigit())
                                 .foregroundStyle(DiaryTheme.muted)
                             if let averageMood = item.averageMood {
-                                Text("平均 \(formatted(averageMood))")
+                                Text("平均 \(formatted(averageMood))（数値\(item.validMoodCount)件）")
                                     .font(.caption.monospacedDigit())
                                     .foregroundStyle(DiaryTheme.muted)
                             }
@@ -207,10 +231,28 @@ struct JournalInsightsView: View {
 
     private var moodTrendSummary: String {
         let days = snapshot.moodTrend.count
-        return "\(days)日分の記録。日ごとの平均気分を表示しています。"
+        let preview = snapshot.moodTrend.prefix(5).map {
+            "\(dateString($0.date)) 平均\(formatted($0.averageScore))、\(entryCountLabel(for: $0))"
+        }.joined(separator: "。")
+        let suffix = days > 5 ? "。残りは日ごとの数値で確認できます" : ""
+        return "\(days)日分の記録。\(preview)\(suffix)"
     }
 
     private func formatted(_ value: Double?) -> String { value.map { String(format: "%.1f", $0) } ?? "—" }
+
+    private func entryCountLabel(for point: MoodTrendPoint) -> String {
+        if point.entryCount == point.validMoodCount {
+            return "\(point.entryCount)件"
+        }
+        return "\(point.entryCount)件（数値\(point.validMoodCount)件）"
+    }
+
+    private func dateString(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ja_JP")
+        formatter.dateFormat = "M月d日"
+        return formatter.string(from: date)
+    }
 
     private func refresh() {
         snapshot = JournalInsightsCalculator.make(entries: entries, range: selectedRange)
