@@ -36,6 +36,7 @@ struct MentalHealthCheckView: View {
     @State private var showingSupportResources = false
     @State private var safetySaveError = false
     @State private var assessmentSaveError = false
+    @State private var assessmentSaved = false
 
     private enum SafetyResponse: String, CaseIterable, Identifiable {
         case notNow = "今はない"
@@ -416,12 +417,22 @@ struct MentalHealthCheckView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 HStack(spacing: 12) {
-                    Button("結果を保存") { saveAssessment() }
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(DiaryTheme.primary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    if assessmentSaved {
+                        Label("保存しました", systemImage: "checkmark.circle.fill")
+                            .font(.headline)
+                            .foregroundStyle(DiaryTheme.green)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(DiaryTheme.accentSoft, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .accessibilityLabel("振り返りを保存しました")
+                    } else {
+                        Button("結果を保存") { saveAssessment() }
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(DiaryTheme.primary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    }
 
                     Button("新しい振り返り") { resetForNewTest() }
                         .font(.headline)
@@ -587,6 +598,7 @@ struct MentalHealthCheckView: View {
         smartphoneBrainAnswers = Array(repeating: -1, count: 12)
         stressCheckAnswers = Array(repeating: -1, count: 20)
         notes = "" // メモをクリア
+        assessmentSaved = false
         safetyGateCompleted = true
         safetyResponse = nil
         showingSupportResources = false
@@ -596,6 +608,7 @@ struct MentalHealthCheckView: View {
     
     // 診断結果をSwiftDataに保存する関数
     private func saveAssessment() {
+        guard !assessmentSaved else { return }
         assessmentSaveError = false
         let draft = SelfCheckResultDraft(
             selectedTests: selectedTests,
@@ -611,6 +624,7 @@ struct MentalHealthCheckView: View {
 
         do {
             _ = try MentalHealthAssessmentSaveService().save(draft: draft, in: context)
+            assessmentSaved = true
         } catch {
             // 保存に失敗しても回答配列はViewのStateに残るため、再試行できる。
             assessmentSaveError = true
