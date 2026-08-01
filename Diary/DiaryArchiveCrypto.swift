@@ -228,9 +228,12 @@ enum DiaryArchiveCrypto {
         }
 
         let normalizedPassword = password.precomposedStringWithCanonicalMapping
-        let passwordBytes = Array(normalizedPassword.utf8)
+        var passwordBytes = Array(normalizedPassword.utf8)
         var derivedBytes = [UInt8](repeating: 0, count: keyByteCount)
         defer {
+            passwordBytes.withUnsafeMutableBytes { buffer in
+                buffer.initializeMemory(as: UInt8.self, repeating: 0)
+            }
             _ = derivedBytes.withUnsafeMutableBytes { buffer in
                 buffer.initializeMemory(as: UInt8.self, repeating: 0)
             }

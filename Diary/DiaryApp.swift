@@ -96,6 +96,21 @@ struct ScienceClubDiaryApp: App {
     init() {
         _lockController = StateObject(wrappedValue: AppLockController())
 
+        let startup = Self.prepareStore()
+        modelContainer = startup.container
+        storeStartupError = startup.errorMessage
+        _protectionStatus = StateObject(
+            wrappedValue: DiaryDataProtectionStatus(report: startup.protectionReport)
+        )
+    }
+
+    private struct StoreStartup {
+        let container: ModelContainer?
+        let errorMessage: String?
+        let protectionReport: DiaryFileProtectionReport
+    }
+
+    private static func prepareStore() -> StoreStartup {
         let schema = Schema([
             MoodEntry.self,
             MentalHealthAssessment.self,
@@ -114,29 +129,27 @@ struct ScienceClubDiaryApp: App {
                 for: schema,
                 configurations: [configuration]
             )
-            modelContainer = container
-            storeStartupError = nil
-            _protectionStatus = StateObject(
-                wrappedValue: DiaryDataProtectionStatus(
-                    report: DiaryFileProtectionService.refreshProtection(
-                        at: initialProtection.storeURL
-                    )
+            return StoreStartup(
+                container: container,
+                errorMessage: nil,
+                protectionReport: DiaryFileProtectionService.refreshProtection(
+                    at: initialProtection.storeURL
                 )
             )
         } catch {
-            modelContainer = nil
-            storeStartupError = error.localizedDescription
-            _protectionStatus = StateObject(
-                wrappedValue: DiaryDataProtectionStatus(report: initialProtection)
+            return StoreStartup(
+                container: nil,
+                errorMessage: error.localizedDescription,
+                protectionReport: initialProtection
             )
         }
     }
 
     var body: some Scene {
         WindowGroup {
-            Group {
+            PrivacyProtectedRootView(lockController: lockController) {
                 if let modelContainer {
-                    PrivacyProtectedRootView(lockController: lockController) {
+                    Group {
                         MoodJournalView()
                             .tint(DiaryTheme.accent)
 #if targetEnvironment(macCatalyst)
@@ -153,6 +166,7 @@ struct ScienceClubDiaryApp: App {
                     )
                 }
             }
+            .environmentObject(lockController)
         }
 #if targetEnvironment(macCatalyst)
         // Macでは縦長のiPhone画面にならないよう、横長の初期ウィンドウを指定する。

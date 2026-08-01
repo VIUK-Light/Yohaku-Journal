@@ -239,6 +239,12 @@ struct ArchivedMentalHealthAssessment: Codable, Equatable, Sendable {
               gad7Answers.count <= DiaryArchiveLimits.maximumValuesPerArray else {
             throw DiaryArchiveValidationError.tooManyValues
         }
+        guard phq9Answers.allSatisfy({ (0...3).contains($0) }),
+              gad7Answers.allSatisfy({ (0...3).contains($0) }),
+              (0...27).contains(phq9Score),
+              (0...21).contains(gad7Score) else {
+            throw DiaryArchiveValidationError.invalidAssessmentValue
+        }
         try validateString(notes)
         try validateString(ageGroupInterpretation)
         try validateStringArray(selectedTests)
@@ -325,6 +331,7 @@ enum DiaryArchiveValidationError: Error, Equatable, LocalizedError {
     case tooManyRecords
     case duplicateIdentifier
     case invalidMoodScore
+    case invalidAssessmentValue
     case tooManyValues
     case stringTooLarge
 
@@ -332,7 +339,7 @@ enum DiaryArchiveValidationError: Error, Equatable, LocalizedError {
         switch self {
         case .unsupportedArchiveVersion:
             return "このバックアップのバージョンには対応していません。"
-        case .invalidDate, .invalidMoodScore, .tooManyValues, .stringTooLarge:
+        case .invalidDate, .invalidMoodScore, .invalidAssessmentValue, .tooManyValues, .stringTooLarge:
             return "バックアップ内の記録形式を確認できませんでした。"
         case .tooManyRecords:
             return "バックアップ内の記録件数が上限を超えています。"

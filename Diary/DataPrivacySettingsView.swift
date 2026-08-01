@@ -235,6 +235,8 @@ struct DataPrivacySettingsView: View {
     }
 
     private func beginBackup() {
+        isWorking = true
+        defer { isWorking = false }
         do {
             let archive = try DiaryArchiveDataService.makeArchive(in: modelContext)
             pendingBackup = PendingBackup(archive: archive)
@@ -308,6 +310,8 @@ struct DataPrivacySettingsView: View {
         _ archive: DiaryArchiveV1,
         policy: RestoreConflictPolicy
     ) -> Bool {
+        isWorking = true
+        defer { isWorking = false }
         do {
             let result = try DiaryArchiveDataService.restore(
                 archive: archive,
@@ -328,6 +332,8 @@ struct DataPrivacySettingsView: View {
     }
 
     private func performFullDeletion() -> Bool {
+        isWorking = true
+        defer { isWorking = false }
         do {
             let deleted = try DiaryArchiveDataService.deleteAll(in: modelContext)
             isShowingDeletion = false

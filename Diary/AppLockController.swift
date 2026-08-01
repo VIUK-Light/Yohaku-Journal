@@ -87,6 +87,11 @@ final class AppLockController: ObservableObject {
 
     private let defaults: UserDefaults
     private let authenticationClient: DeviceOwnerAuthenticationClient
+    private var pendingUnlockTask: Task<Void, Never>?
+    private var authenticationGeneration = 0
+    // アプリの初期化直後も、既存の設定画面からの認証APIを利用できるよう
+    // activeを既定にする。実際のScenePhase通知で直ちに同期される。
+    private var isSceneActive = true
 
     init(
         defaults: UserDefaults = .standard,
@@ -103,15 +108,24 @@ final class AppLockController: ObservableObject {
     func handleScenePhase(_ phase: ScenePhase) {
         switch phase {
         case .inactive, .background:
+            isSceneActive = false
             protectForBackground()
         case .active:
-            Task { await unlockIfNeeded() }
+            isSceneActive = true
+            pendingUnlockTask?.cancel()
+            pendingUnlockTask = Task { [weak self] in
+                await self?.unlockIfNeeded()
+            }
         @unknown default:
+            isSceneActive = false
             protectForBackground()
         }
     }
 
     func protectForBackground() {
+        authenticationGeneration &+= 1
+        pendingUnlockTask?.cancel()
+        pendingUnlockTask = nil
         guard isEnabled else { return }
         isPrivacyShieldVisible = true
         isLocked = true
@@ -167,7 +181,18 @@ final class AppLockController: ObservableObject {
     @discardableResult
     func authenticateForUnlock() async -> Bool {
         guard isEnabled else { return true }
+        let generation = authenticationGeneration
         guard await authenticate(reason: "日記の記録を開きます。") else {
+            isPrivacyShieldVisible = true
+            isLocked = true
+            return false
+        }
+
+        // 認証待ちの間にバックグラウンドへ移った場合、古い成功結果を
+        // 画面へ適用しない。再びactiveになったときに新しい認証を行う。
+        guard isSceneActive,
+              isEnabled,
+              authenticationGeneration == generation else {
             isPrivacyShieldVisible = true
             isLocked = true
             return false

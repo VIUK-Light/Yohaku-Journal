@@ -103,6 +103,39 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         }
     }
 
+    func testInvalidAssessmentValuesAreRejectedBeforeEncryption() {
+        let date = Date(timeIntervalSince1970: 1_785_484_800)
+        let invalidAssessment = ArchivedMentalHealthAssessment(
+            id: UUID(),
+            date: date,
+            phq9Score: 28,
+            gad7Score: 0,
+            phq9Answers: [0, 1, 2, 3, 4],
+            gad7Answers: [],
+            notes: "",
+            selectedTests: ["PHQ-9"],
+            isPhq9Completed: true,
+            isGad7Completed: false,
+            ageGroupInterpretation: "",
+            userAge: 0
+        )
+        let archive = DiaryArchiveV1(
+            exportedAt: date,
+            moodEntries: [],
+            assessments: [invalidAssessment],
+            safetyChecks: []
+        )
+
+        XCTAssertThrowsError(
+            try DiaryArchiveCrypto.encrypt(archive: archive, password: password)
+        ) { error in
+            XCTAssertEqual(
+                error as? DiaryArchiveValidationError,
+                .invalidAssessmentValue
+            )
+        }
+    }
+
     func testVisuallyEquivalentCanonicalPasswordsDeriveSameKey() throws {
         let composed = "café password phrase"
         let decomposed = "cafe\u{301} password phrase"
@@ -489,6 +522,51 @@ final class AppLockControllerTests: XCTestCase {
         XCTAssertTrue(controller.isLocked)
         XCTAssertTrue(controller.isPrivacyShieldVisible)
     }
+
+    func testBackgroundInvalidatesPendingUnlockResult() async {
+        defaults.set(true, forKey: AppLockController.defaultsKey)
+        let gate = AuthenticationGate()
+        let controller = AppLockController(
+            defaults: defaults,
+            authenticationClient: DeviceOwnerAuthenticationClient { _ in
+                try await gate.wait()
+            }
+        )
+
+        let unlockTask = Task { @MainActor in
+            await controller.authenticateForUnlock()
+        }
+        await gate.waitUntilStarted()
+
+        controller.protectForBackground()
+        await gate.succeed()
+
+        let didUnlock = await unlockTask.value
+        XCTAssertFalse(didUnlock)
+        XCTAssertTrue(controller.isLocked)
+        XCTAssertTrue(controller.isPrivacyShieldVisible)
+    }
+}
+
+private actor AuthenticationGate {
+    private var continuation: CheckedContinuation<Void, Error>?
+
+    func wait() async throws {
+        try await withCheckedThrowingContinuation { continuation in
+            self.continuation = continuation
+        }
+    }
+
+    func waitUntilStarted() async {
+        while continuation == nil {
+            await Task.yield()
+        }
+    }
+
+    func succeed() {
+        continuation?.resume()
+        continuation = nil
+    }
 }
 
 final class AppDataProtectionConfigurationTests: XCTestCase {
@@ -503,13 +581,18 @@ final class AppDataProtectionConfigurationTests: XCTestCase {
             bundle.object(forInfoDictionaryKey: "UTExportedTypeDeclarations")
                 as? [[String: Any]]
         )
-        let backupType = declarations.first { declaration in
-            declaration["UTTypeIdentifier"] as? String
-                == UTType.yohakuJournalBackup.identifier
-        }
-        let tags = backupType?["UTTypeTagSpecification"] as? [String: Any]
+        let backupType = try XCTUnwrap(
+            declarations.first { declaration in
+                declaration["UTTypeIdentifier"] as? String
+                    == UTType.yohakuJournalBackup.identifier
+            },
+            "UTExportedTypeDeclarations にバックアップ用UTIがありません。"
+        )
+        let tags = try XCTUnwrap(
+            backupType["UTTypeTagSpecification"] as? [String: Any]
+        )
         XCTAssertEqual(
-            tags?["public.filename-extension"] as? [String],
+            tags["public.filename-extension"] as? [String],
             ["yohakubackup"]
         )
     }
@@ -522,19 +605,19 @@ final class AppDataProtectionConfigurationTests: XCTestCase {
             at: directory,
             withIntermediateDirectories: true
         )
-        try Data("protected".utf8).write(to: file)
         defer { try? FileManager.default.removeItem(at: directory) }
+        try Data("protected".utf8).write(to: file)
 
 #if targetEnvironment(simulator)
         do {
             try DiaryFileProtectionService.applyCompleteProtection(to: file)
             try assertCompleteProtection(at: file)
         } catch {
-            // SimulatorはData Protectionを再現しない場合がある。その場合も成功扱いにしない。
-            XCTAssertEqual(
-                error as? DiaryFileProtectionError,
-                .protectionCouldNotBeConfirmed
-            )
+            guard let protectionError = error as? DiaryFileProtectionError,
+                  protectionError == .protectionCouldNotBeConfirmed else {
+                throw error
+            }
+            throw XCTSkip("Simulatorは.completeファイル保護を再現しません。実機で検証してください。")
         }
 #else
         try DiaryFileProtectionService.applyCompleteProtection(to: file)
