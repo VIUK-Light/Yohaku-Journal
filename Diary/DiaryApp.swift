@@ -54,6 +54,9 @@ enum DiaryTheme {
 }
 
 enum DiaryRuntime {
+    static let macWindowDefaultSize = CGSize(width: 1100, height: 700)
+    static let macWindowMinimumSize = CGSize(width: 900, height: 600)
+
     static var isMacWindow: Bool {
 #if targetEnvironment(macCatalyst)
         true
@@ -98,7 +101,10 @@ struct ScienceClubDiaryApp: App {
         .modelContainer(for: [MoodEntry.self, MentalHealthAssessment.self, LightSafetyCheckRecord.self])
 #if targetEnvironment(macCatalyst)
         // Macでは縦長のiPhone画面にならないよう、横長の初期ウィンドウを指定する。
-        .defaultSize(width: 1180, height: 760)
+        .defaultSize(
+            width: DiaryRuntime.macWindowDefaultSize.width,
+            height: DiaryRuntime.macWindowDefaultSize.height
+        )
         .windowResizability(.contentMinSize)
 #endif
     }
@@ -107,7 +113,7 @@ struct ScienceClubDiaryApp: App {
 #if targetEnvironment(macCatalyst)
 /// 保存済みの縦長ウィンドウが残っていても、Macの2カラムUIを表示できる幅へ戻す。
 private struct MacWindowConfigurator: UIViewRepresentable {
-    private let minimumSize = CGSize(width: 1024, height: 700)
+    private let minimumSize = DiaryRuntime.macWindowMinimumSize
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView(frame: .zero)
