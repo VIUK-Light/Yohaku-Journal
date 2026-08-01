@@ -54,7 +54,8 @@ struct JournalInsightsSnapshot {
 
 private struct MoodAggregate {
     var total = 0
-    var count = 0
+    var recordCount = 0
+    var moodCount = 0
 }
 
 /// 記録配列を一度だけ走査し、観察画面に必要な値型だけを作る。
@@ -77,38 +78,51 @@ enum JournalInsightsCalculator {
 
         var totalEntries = 0
         var totalMoodScore = 0
+        var validMoodCount = 0
         var moodByDay: [Date: MoodAggregate] = [:]
         var events: [String: MoodAggregate] = [:]
 
         for entry in entries where entry.date >= startDate && entry.date < endDate {
             totalEntries += 1
-            totalMoodScore += entry.moodScore
 
             let day = calendar.startOfDay(for: entry.date)
-            moodByDay[day, default: MoodAggregate()].count += 1
-            moodByDay[day, default: MoodAggregate()].total += entry.moodScore
+            moodByDay[day, default: MoodAggregate()].recordCount += 1
 
-            for event in Set(entry.influences) where !event.isEmpty {
-                events[event, default: MoodAggregate()].count += 1
+            let normalizedEvents = Set(entry.influences.compactMap { event in
+                let trimmed = event.trimmingCharacters(in: .whitespacesAndNewlines)
+                return trimmed.isEmpty ? nil : trimmed
+            })
+            for event in normalizedEvents {
+                events[event, default: MoodAggregate()].recordCount += 1
+            }
+
+            guard (1...7).contains(entry.moodScore) else { continue }
+
+            totalMoodScore += entry.moodScore
+            validMoodCount += 1
+            moodByDay[day, default: MoodAggregate()].moodCount += 1
+            moodByDay[day, default: MoodAggregate()].total += entry.moodScore
+            for event in normalizedEvents {
+                events[event, default: MoodAggregate()].moodCount += 1
                 events[event, default: MoodAggregate()].total += entry.moodScore
             }
         }
 
         let trend = moodByDay.keys.sorted().compactMap { day -> MoodTrendPoint? in
-            guard let aggregate = moodByDay[day], aggregate.count > 0 else { return nil }
+            guard let aggregate = moodByDay[day], aggregate.moodCount > 0 else { return nil }
             return MoodTrendPoint(
                 date: day,
-                averageScore: Double(aggregate.total) / Double(aggregate.count),
-                entryCount: aggregate.count
+                averageScore: Double(aggregate.total) / Double(aggregate.moodCount),
+                entryCount: aggregate.recordCount
             )
         }
 
         let sortedEvents = events.map { name, aggregate in
             EventBreakdown(
                 name: name,
-                entryCount: aggregate.count,
-                averageMood: aggregate.count >= 3
-                    ? Double(aggregate.total) / Double(aggregate.count)
+                entryCount: aggregate.recordCount,
+                averageMood: aggregate.moodCount >= 3
+                    ? Double(aggregate.total) / Double(aggregate.moodCount)
                     : nil
             )
         }
@@ -119,7 +133,7 @@ enum JournalInsightsCalculator {
 
         return JournalInsightsSnapshot(
             totalEntries: totalEntries,
-            averageMood: totalEntries == 0 ? nil : Double(totalMoodScore) / Double(totalEntries),
+            averageMood: validMoodCount == 0 ? nil : Double(totalMoodScore) / Double(validMoodCount),
             eventTagTypeCount: events.count,
             moodTrend: trend,
             eventBreakdowns: Array(sortedEvents.prefix(8)),
