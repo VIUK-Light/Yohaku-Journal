@@ -68,10 +68,6 @@ struct MoodJournalView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .frame(
-            minWidth: DiaryRuntime.isMacWindow ? 1024 : 0,
-            minHeight: DiaryRuntime.isMacWindow ? 700 : 0
-        )
     }
 
     private var compactShell: some View {
