@@ -18,8 +18,15 @@
 		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
 		4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */; };
 		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
+		5655D1670B17C3B244B13747 /* JournalTimelineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C356F40BD31F517932094 /* JournalTimelineRow.swift */; };
+		61F72810EB9AC9861E8AEFF4 /* JournalInsightsSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03CA4472E69FC6223102C64 /* JournalInsightsSnapshot.swift */; };
+		62A7548D2D916C76230DDD9B /* JournalRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9CDD149CF611554A8314B4C /* JournalRecordView.swift */; };
 		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */; };
+		AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */; };
+		B58896F34741D464B7B41717 /* JournalTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17495CDEA94E8866453E0700 /* JournalTimeline.swift */; };
+		C53A79F6835D05DC3AF9FDE3 /* JournalInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */; };
 		DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */; };
 		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
 /* End PBXBuildFile section */
@@ -36,6 +43,8 @@
 
 /* Begin PBXFileReference section */
 		0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryDraft.swift; sourceTree = "<group>"; };
+		17495CDEA94E8866453E0700 /* JournalTimeline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimeline.swift; sourceTree = "<group>"; };
+		1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsSnapshotTests.swift; sourceTree = "<group>"; };
 		3115FFDFC83C98AD90565965 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
 		35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryLineIcon.swift; sourceTree = "<group>"; };
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
@@ -49,8 +58,13 @@
 		9B7674FA667D8FF29B01AF59 /* RecordKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordKind.swift; sourceTree = "<group>"; };
 		9E9F747607977F6DE87AC4BC /* Science Club Diary.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Science Club Diary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSafetyCheckRecord.swift; sourceTree = "<group>"; };
+		C03CA4472E69FC6223102C64 /* JournalInsightsSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsSnapshot.swift; sourceTree = "<group>"; };
+		C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimelineTests.swift; sourceTree = "<group>"; };
+		CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsView.swift; sourceTree = "<group>"; };
+		D30C356F40BD31F517932094 /* JournalTimelineRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimelineRow.swift; sourceTree = "<group>"; };
 		DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoodEntryView.swift; sourceTree = "<group>"; };
 		E3602C212FA0CF313F99C3FE /* DiaryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryApp.swift; sourceTree = "<group>"; };
+		E9CDD149CF611554A8314B4C /* JournalRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalRecordView.swift; sourceTree = "<group>"; };
 		FFB67B6060F19002D6ACE327 /* ArticleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleListView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -71,6 +85,11 @@
 				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
 				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
 				0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */,
+				C03CA4472E69FC6223102C64 /* JournalInsightsSnapshot.swift */,
+				CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */,
+				E9CDD149CF611554A8314B4C /* JournalRecordView.swift */,
+				17495CDEA94E8866453E0700 /* JournalTimeline.swift */,
+				D30C356F40BD31F517932094 /* JournalTimelineRow.swift */,
 				AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */,
 				736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */,
 				5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */,
@@ -88,6 +107,8 @@
 			isa = PBXGroup;
 			children = (
 				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
+				1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */,
+				C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */,
 			);
 			path = ScienceClubDiaryTests;
 			sourceTree = "<group>";
@@ -192,6 +213,11 @@
 				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
 				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
 				DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */,
+				61F72810EB9AC9861E8AEFF4 /* JournalInsightsSnapshot.swift in Sources */,
+				C53A79F6835D05DC3AF9FDE3 /* JournalInsightsView.swift in Sources */,
+				62A7548D2D916C76230DDD9B /* JournalRecordView.swift in Sources */,
+				B58896F34741D464B7B41717 /* JournalTimeline.swift in Sources */,
+				5655D1670B17C3B244B13747 /* JournalTimelineRow.swift in Sources */,
 				4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */,
 				2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */,
 				FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */,
@@ -209,6 +235,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
+				AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */,
+				AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

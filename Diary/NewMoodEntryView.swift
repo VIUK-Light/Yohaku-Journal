@@ -26,23 +26,30 @@ struct NewMoodEntryView: View {
     @State private var showingAdditionalEvents = false
     @State private var customEventTag = ""
     @State private var isSaving = false
+    @State private var dailyReflectionConflictID: UUID?
     @FocusState private var focusedField: InputField?
 
     private let entryToEdit: MoodEntry?
+    private let initialRecordType: String
     let onSave: (MoodEntry) -> Void
     let onCancel: () -> Void
+    let onDailyReflectionConflict: (UUID) -> Void
 
     init(
+        initialRecordKind: RecordKind = .moment,
         entryToEdit: MoodEntry? = nil,
         onSave: @escaping (MoodEntry) -> Void,
-        onCancel: @escaping () -> Void = {}
+        onCancel: @escaping () -> Void = {},
+        onDailyReflectionConflict: @escaping (UUID) -> Void = { _ in }
     ) {
         self.entryToEdit = entryToEdit
+        self.initialRecordType = entryToEdit?.recordType ?? initialRecordKind.storageValue
         self.onSave = onSave
         self.onCancel = onCancel
+        self.onDailyReflectionConflict = onDailyReflectionConflict
 
         _selectedMoodScore = State(initialValue: entryToEdit?.moodScore ?? 4)
-        _selectedRecordType = State(initialValue: entryToEdit?.recordType ?? "今現在の気分")
+        _selectedRecordType = State(initialValue: entryToEdit?.recordType ?? initialRecordKind.storageValue)
         _selectedEmotions = State(initialValue: Set(entryToEdit?.emotions ?? []))
         _selectedInfluences = State(initialValue: Set(entryToEdit?.influences ?? []))
         _selectedLifeFactors = State(initialValue: Set(entryToEdit?.lifeFactors ?? []))
@@ -135,6 +142,11 @@ struct NewMoodEntryView: View {
             Text("入力中の内容は保存されません。")
         }
         .alert("保存できませんでした", isPresented: $showingSaveError) {
+            if let dailyReflectionConflictID {
+                Button("既存の振り返りを開く") {
+                    onDailyReflectionConflict(dailyReflectionConflictID)
+                }
+            }
             Button("OK", role: .cancel) {}
         } message: {
             Text(saveErrorMessage)
@@ -662,7 +674,7 @@ struct NewMoodEntryView: View {
 
         guard let entryToEdit else {
             return selectedMoodScore != 4 ||
-                selectedRecordType != recordTypes[0] ||
+                selectedRecordType != initialRecordType ||
                 !selectedEmotions.isEmpty ||
                 !selectedInfluences.isEmpty ||
                 !selectedLifeFactors.isEmpty ||
@@ -698,6 +710,7 @@ struct NewMoodEntryView: View {
         isSaving = true
 
         do {
+            dailyReflectionConflictID = nil
             let draft = JournalEntryDraft(
                 recordType: selectedRecordType,
                 mood: moodLabels[selectedMoodScore - 1],
@@ -716,8 +729,14 @@ struct NewMoodEntryView: View {
                 in: context
             )
             onSave(savedEntry)
+        } catch JournalEntrySaveError.dailyReflectionAlreadyExists(let existingID) {
+            isSaving = false
+            dailyReflectionConflictID = existingID
+            saveErrorMessage = JournalEntrySaveError.dailyReflectionAlreadyExists(existingID).localizedDescription
+            showingSaveError = true
         } catch {
             isSaving = false
+            dailyReflectionConflictID = nil
             saveErrorMessage = error.localizedDescription
             showingSaveError = true
         }
