@@ -264,59 +264,12 @@ enum SelfCheckCatalog {
     }
 }
 
-/// 現在停止中の標準尺度だけを識別する型。
-/// 独自の振り返りを誤って採点APIへ渡せないよう、SelfCheckTypeとは分離する。
-enum StandardizedSelfCheckType {
-    case phq9
-    case gad7
-    case k6
-    case k10
-    case stressCheck
-}
-
-/// 標準尺度の既存採点をUIや永続化から隔離した純粋関数群。
-/// 新規実行は、根拠・利用条件・安全導線の検証が終わるまで停止している。
+/// 既存SwiftDataモデルとの互換性のために保存する合計値だけを扱う。
+/// 標準尺度の重症度・診断的な解釈は実装しない。
 enum SelfCheckScoring {
     static func total(_ answers: [Int]) -> Int {
         answers.reduce(0, +)
     }
-
-    static func interpretation(for type: StandardizedSelfCheckType, score: Int) -> String {
-        switch type {
-        case .phq9, .k6:
-            switch score {
-            case 0...4: return "軽微"
-            case 5...9: return "軽度"
-            case 10...14: return "中等度"
-            case 15...19: return "やや重度"
-            default: return "重度"
-            }
-        case .gad7:
-            switch score {
-            case 0...4: return "軽微"
-            case 5...9: return "軽度"
-            case 10...14: return "中等度"
-            default: return "重度"
-            }
-        case .k10:
-            switch score {
-            case 0...7: return "軽微"
-            case 8...15: return "軽度"
-            case 16...24: return "中等度"
-            case 25...30: return "やや重度"
-            default: return "重度"
-            }
-        case .stressCheck:
-            switch score {
-            case 0...20: return "気づきは少なめ"
-            case 21...40: return "いくつか気づきあり"
-            case 41...60: return "負担を振り返る材料あり"
-            case 61...80: return "相談や休息を考える材料あり"
-            default: return "記録を確認"
-            }
-        }
-    }
-
 }
 
 /// 画面の入力状態を、SwiftDataモデルへ直接書き込む前に隔離する値型。
