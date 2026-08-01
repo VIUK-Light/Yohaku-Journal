@@ -94,6 +94,19 @@ enum SupportResourceCatalog {
             lastVerified: lastVerified
         ),
         SupportResource(
+            id: "yorisoi-hotline",
+            name: "よりそいホットライン",
+            summary: "ガイダンスから、悩みや状況に合う専門的な相談につながる無料電話です。",
+            audience: "今の困りごとを電話で相談したい人",
+            availability: "24時間対応（050は050-3655-0279）",
+            contactLabel: "0120-279-338",
+            contactKind: .phone,
+            destinationString: "tel:01200279338",
+            sourceURLString: "https://www.mhlw.go.jp/mamorouyokokoro/soudan/tel/",
+            urgency: .immediate,
+            lastVerified: lastVerified
+        ),
+        SupportResource(
             id: "child-sos-24h",
             name: "24時間子供SOSダイヤル",
             summary: "いじめや、そのほかの子どものSOSについて、地域の教育委員会の相談機関につながります。",

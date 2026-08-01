@@ -29,6 +29,8 @@ final class SupportResourceCatalogTests: XCTestCase {
 
         XCTAssertEqual(resources["inochi-sos"]?.contactLabel, "0120-061-338")
         XCTAssertEqual(resources["inochi-sos"]?.availability, "24時間・365日")
+        XCTAssertEqual(resources["yorisoi-hotline"]?.contactLabel, "0120-279-338")
+        XCTAssertEqual(resources["yorisoi-hotline"]?.availability, "24時間対応（050は050-3655-0279）")
         XCTAssertEqual(resources["child-sos-24h"]?.contactLabel, "0120-0-78310")
         XCTAssertEqual(resources["childline"]?.contactLabel, "0120-99-7777")
         XCTAssertEqual(resources["public-mental-health"]?.contactLabel, "0570-064-556")

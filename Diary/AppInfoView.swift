@@ -10,6 +10,7 @@ struct AppInfoView: View {
     private var safetyRecords: [LightSafetyCheckRecord]
     @State private var showingSafetyRecordDeletion = false
     @State private var showingSafetyRecordError = false
+    @State private var showingSupportResources = false
 
     var body: some View {
         NavigationStack {
@@ -114,15 +115,19 @@ struct AppInfoView: View {
                 .foregroundStyle(DiaryTheme.ink)
                 .fixedSize(horizontal: false, vertical: true)
 
-            ForEach(["public-mental-health", "anata-no-ibasho", "mhlw-support-directory"], id: \.self) { resourceID in
-                if let resource = SupportResourceCatalog.resources.first(where: { $0.id == resourceID }) {
-                    SupportResourceRow(resource: resource)
-                }
+            Button {
+                showingSupportResources = true
+            } label: {
+                Label("相談先を開く", systemImage: "person.2")
             }
+            .foregroundStyle(DiaryTheme.accent)
 
-            Text("受付時間や接続条件は変わることがあります。最終確認日と公式出典は相談先画面で確認できます。")
+            Text("窓口の選択と公式出典の確認を、共通の相談先画面にまとめています。受付時間や接続条件は変わることがあります。")
                 .font(.caption)
                 .foregroundStyle(DiaryTheme.muted)
+        }
+        .sheet(isPresented: $showingSupportResources) {
+            SupportResourcesView()
         }
     }
 
