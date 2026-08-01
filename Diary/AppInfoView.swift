@@ -10,6 +10,7 @@ struct AppInfoView: View {
     private var safetyRecords: [LightSafetyCheckRecord]
     @State private var showingSafetyRecordDeletion = false
     @State private var showingSafetyRecordError = false
+    @State private var showingDataPrivacy = false
 
     var body: some View {
         NavigationStack {
@@ -18,6 +19,7 @@ struct AppInfoView: View {
                 missionSection
                 toolsSection
                 safetySection
+                dataProtectionSection
                 safetyRecordSection
                 supportSection
             }
@@ -30,6 +32,11 @@ struct AppInfoView: View {
                         dismiss()
                     }
                 }
+            }
+        }
+        .sheet(isPresented: $showingDataPrivacy) {
+            NavigationStack {
+                DataPrivacySettingsView()
             }
         }
     }
@@ -104,6 +111,22 @@ struct AppInfoView: View {
                 title: "医療的な診断ではありません",
                 detail: "セルフチェックの結果は、医療機関による診断や治療の代わりにはなりません。"
             )
+        }
+    }
+
+    private var dataProtectionSection: some View {
+        Section("データ保護") {
+            Button {
+                showingDataPrivacy = true
+            } label: {
+                InfoRow(
+                    icon: "lock.shield",
+                    title: "プライバシーとデータ",
+                    detail: "アプリロック、暗号化バックアップ、復元、全削除を管理します。"
+                )
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("端末認証とデータの保護設定を開きます")
         }
     }
 
