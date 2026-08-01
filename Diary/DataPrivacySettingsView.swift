@@ -413,6 +413,7 @@ private struct BackupPasswordSheet: View {
     @State private var confirmation = ""
     @State private var isWorking = false
     @State private var errorMessage: String?
+    @State private var operation: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -457,6 +458,8 @@ private struct BackupPasswordSheet: View {
         }
         .interactiveDismissDisabled(isWorking)
         .onDisappear {
+            operation?.cancel()
+            operation = nil
             password = ""
             confirmation = ""
         }
@@ -476,23 +479,39 @@ private struct BackupPasswordSheet: View {
         isWorking = true
         errorMessage = nil
 
-        Task {
+        operation = Task { @MainActor in
+            defer {
+                isWorking = false
+                operation = nil
+            }
             do {
-                let data = try await Task.detached(priority: .userInitiated) {
-                    try DiaryArchiveCrypto.encrypt(
-                        archive: archive,
-                        password: passwordForEncryption
-                    )
-                }.value
+                try Task.checkCancellation()
+            } catch {
+                return
+            }
+            let worker = Task.detached(priority: .userInitiated) {
+                try await DiaryArchiveCrypto.encrypt(
+                    archive: archive,
+                    password: passwordForEncryption
+                )
+            }
+            do {
+                let data = try await withTaskCancellationHandler(operation: {
+                    try await worker.value
+                }, onCancel: {
+                    worker.cancel()
+                })
+                try Task.checkCancellation()
                 password = ""
                 confirmation = ""
                 onEncrypted(data)
                 dismiss()
+            } catch is CancellationError {
+                // キャンセルされた暗号化結果は適用しない。
             } catch {
                 errorMessage = (error as? LocalizedError)?.errorDescription
                     ?? error.localizedDescription
             }
-            isWorking = false
         }
     }
 }
@@ -505,6 +524,7 @@ private struct RestorePasswordSheet: View {
     @State private var password = ""
     @State private var isWorking = false
     @State private var errorMessage: String?
+    @State private var operation: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -544,7 +564,11 @@ private struct RestorePasswordSheet: View {
             }
         }
         .interactiveDismissDisabled(isWorking)
-        .onDisappear { password = "" }
+        .onDisappear {
+            operation?.cancel()
+            operation = nil
+            password = ""
+        }
     }
 
     private func decryptArchive() {
@@ -552,22 +576,38 @@ private struct RestorePasswordSheet: View {
         isWorking = true
         errorMessage = nil
 
-        Task {
+        operation = Task { @MainActor in
+            defer {
+                isWorking = false
+                operation = nil
+            }
             do {
-                let archive = try await Task.detached(priority: .userInitiated) {
-                    try DiaryArchiveCrypto.decrypt(
-                        encryptedData: encryptedData,
-                        password: passwordForDecryption
-                    )
-                }.value
+                try Task.checkCancellation()
+            } catch {
+                return
+            }
+            let worker = Task.detached(priority: .userInitiated) {
+                try await DiaryArchiveCrypto.decrypt(
+                    encryptedData: encryptedData,
+                    password: passwordForDecryption
+                )
+            }
+            do {
+                let archive = try await withTaskCancellationHandler(operation: {
+                    try await worker.value
+                }, onCancel: {
+                    worker.cancel()
+                })
+                try Task.checkCancellation()
                 password = ""
                 onDecrypted(archive)
                 dismiss()
+            } catch is CancellationError {
+                // キャンセルされた復号結果は適用しない。
             } catch {
                 errorMessage = (error as? LocalizedError)?.errorDescription
                     ?? error.localizedDescription
             }
-            isWorking = false
         }
     }
 }

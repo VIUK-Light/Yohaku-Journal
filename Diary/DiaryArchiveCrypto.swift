@@ -89,9 +89,11 @@ enum DiaryArchiveCrypto {
     static func encrypt(
         archive: DiaryArchiveV1,
         password: String
-    ) throws -> Data {
+    ) async throws -> Data {
+        try Task.checkCancellation()
         try DiaryArchivePasswordPolicy.validate(password)
         try archive.validate()
+        try Task.checkCancellation()
 
         let salt = try secureRandomData(count: saltByteCount)
         let header = EncryptedDiaryArchiveHeader(
@@ -104,6 +106,7 @@ enum DiaryArchiveCrypto {
         )
         let authenticatedHeader = try canonicalEncoder().encode(header)
         let plaintext = try archiveEncoder().encode(archive)
+        try Task.checkCancellation()
         guard plaintext.count <= DiaryArchiveLimits.maximumEncryptedFileBytes else {
             throw DiaryArchiveCryptoError.fileTooLarge
         }
@@ -114,6 +117,7 @@ enum DiaryArchiveCrypto {
             iterations: currentIterations,
             keyByteCount: keyByteCount
         )
+        try Task.checkCancellation()
         let symmetricKey = SymmetricKey(data: derivedKey)
         let nonceData = try secureRandomData(count: nonceByteCount)
         let nonce = try AES.GCM.Nonce(data: nonceData)
@@ -123,6 +127,7 @@ enum DiaryArchiveCrypto {
             nonce: nonce,
             authenticating: authenticatedHeader
         )
+        try Task.checkCancellation()
 
         let envelope = EncryptedDiaryArchiveEnvelope(
             header: header,
@@ -131,6 +136,7 @@ enum DiaryArchiveCrypto {
             authenticationTag: sealed.tag
         )
         let encryptedData = try canonicalEncoder().encode(envelope)
+        try Task.checkCancellation()
         guard encryptedData.count <= DiaryArchiveLimits.maximumEncryptedFileBytes else {
             throw DiaryArchiveCryptoError.fileTooLarge
         }
@@ -140,7 +146,8 @@ enum DiaryArchiveCrypto {
     static func decrypt(
         encryptedData: Data,
         password: String
-    ) throws -> DiaryArchiveV1 {
+    ) async throws -> DiaryArchiveV1 {
+        try Task.checkCancellation()
         guard encryptedData.count <= DiaryArchiveLimits.maximumEncryptedFileBytes else {
             throw DiaryArchiveCryptoError.fileTooLarge
         }
@@ -164,6 +171,7 @@ enum DiaryArchiveCrypto {
             iterations: envelope.header.iterations,
             keyByteCount: keyByteCount
         )
+        try Task.checkCancellation()
 
         let plaintext: Data
         do {
@@ -178,16 +186,21 @@ enum DiaryArchiveCrypto {
                 authenticating: authenticatedHeader
             )
         } catch {
+            try Task.checkCancellation()
             throw DiaryArchiveCryptoError.authenticationFailed
         }
+        try Task.checkCancellation()
 
         let archive: DiaryArchiveV1
         do {
             archive = try archiveDecoder().decode(DiaryArchiveV1.self, from: plaintext)
         } catch {
+            try Task.checkCancellation()
             throw DiaryArchiveCryptoError.invalidFile
         }
+        try Task.checkCancellation()
         try archive.validate()
+        try Task.checkCancellation()
         return archive
     }
 

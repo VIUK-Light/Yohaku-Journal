@@ -245,6 +245,18 @@ struct ArchivedMentalHealthAssessment: Codable, Equatable, Sendable {
               (0...21).contains(gad7Score) else {
             throw DiaryArchiveValidationError.invalidAssessmentValue
         }
+        if isPhq9Completed {
+            guard phq9Answers.count == 9,
+                  phq9Answers.reduce(0, +) == phq9Score else {
+                throw DiaryArchiveValidationError.invalidAssessmentValue
+            }
+        }
+        if isGad7Completed {
+            guard gad7Answers.count == 7,
+                  gad7Answers.reduce(0, +) == gad7Score else {
+                throw DiaryArchiveValidationError.invalidAssessmentValue
+            }
+        }
         try validateString(notes)
         try validateString(ageGroupInterpretation)
         try validateStringArray(selectedTests)

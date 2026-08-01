@@ -33,15 +33,15 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         )
     }
 
-    func testEncryptedArchiveRoundTripsAndRecordsSecurityParameters() throws {
+    func testEncryptedArchiveRoundTripsAndRecordsSecurityParameters() async throws {
         let archive = makeArchive()
 
-        let encrypted = try DiaryArchiveCrypto.encrypt(
+        let encrypted = try await DiaryArchiveCrypto.encrypt(
             archive: archive,
             password: password
         )
         let metadata = try DiaryArchiveCrypto.metadata(from: encrypted)
-        let decrypted = try DiaryArchiveCrypto.decrypt(
+        let decrypted = try await DiaryArchiveCrypto.decrypt(
             encryptedData: encrypted,
             password: password
         )
@@ -54,38 +54,42 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         XCTAssertEqual(decrypted, archive)
     }
 
-    func testWrongPasswordDoesNotReturnPlaintext() throws {
-        let encrypted = try DiaryArchiveCrypto.encrypt(
+    func testWrongPasswordDoesNotReturnPlaintext() async throws {
+        let encrypted = try await DiaryArchiveCrypto.encrypt(
             archive: makeArchive(),
             password: password
         )
 
-        XCTAssertThrowsError(
-            try DiaryArchiveCrypto.decrypt(
+        do {
+            _ = try await DiaryArchiveCrypto.decrypt(
                 encryptedData: encrypted,
                 password: "this password is incorrect"
             )
-        ) { error in
+            XCTFail("誤ったパスワードで復号できてはいけません")
+        } catch {
             XCTAssertEqual(error as? DiaryArchiveCryptoError, .authenticationFailed)
         }
     }
 
-    func testCiphertextTamperingIsDetected() throws {
-        let encrypted = try DiaryArchiveCrypto.encrypt(
+    func testCiphertextTamperingIsDetected() async throws {
+        let encrypted = try await DiaryArchiveCrypto.encrypt(
             archive: makeArchive(),
             password: password
         )
         let tampered = try tamperWithCiphertext(in: encrypted)
 
-        XCTAssertThrowsError(
-            try DiaryArchiveCrypto.decrypt(
+        do {
+            _ = try await DiaryArchiveCrypto.decrypt(
                 encryptedData: tampered,
                 password: password
             )
-        )
+            XCTFail("改ざんされた暗号文を復号できてはいけません")
+        } catch {
+            XCTAssertTrue(error is DiaryArchiveCryptoError)
+        }
     }
 
-    func testUnsupportedArchiveVersionIsRejectedBeforeEncryption() {
+    func testUnsupportedArchiveVersionIsRejectedBeforeEncryption() throws {
         let archive = DiaryArchiveV1(
             formatVersion: 99,
             moodEntries: [],
@@ -93,9 +97,7 @@ final class DiaryArchiveCryptoTests: XCTestCase {
             safetyChecks: []
         )
 
-        XCTAssertThrowsError(
-            try DiaryArchiveCrypto.encrypt(archive: archive, password: password)
-        ) { error in
+        XCTAssertThrowsError(try archive.validate()) { error in
             XCTAssertEqual(
                 error as? DiaryArchiveValidationError,
                 .unsupportedArchiveVersion(99)
@@ -103,36 +105,124 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         }
     }
 
-    func testInvalidAssessmentValuesAreRejectedBeforeEncryption() {
-        let date = Date(timeIntervalSince1970: 1_785_484_800)
-        let invalidAssessment = ArchivedMentalHealthAssessment(
-            id: UUID(),
-            date: date,
-            phq9Score: 28,
-            gad7Score: 0,
-            phq9Answers: [0, 1, 2, 3, 4],
-            gad7Answers: [],
-            notes: "",
-            selectedTests: ["PHQ-9"],
-            isPhq9Completed: true,
-            isGad7Completed: false,
-            ageGroupInterpretation: "",
-            userAge: 0
-        )
-        let archive = DiaryArchiveV1(
-            exportedAt: date,
-            moodEntries: [],
-            assessments: [invalidAssessment],
-            safetyChecks: []
+    func testAssessmentValidationRejectsEachInvalidBoundaryIndividually() {
+        let invalidCases: [(String, ArchivedMentalHealthAssessment, DiaryArchiveValidationError)] = [
+            ("PHQ回答 -1", makeAssessment(phq9Answers: [-1]), .invalidAssessmentValue),
+            ("PHQ回答 4", makeAssessment(phq9Answers: [4]), .invalidAssessmentValue),
+            ("GAD回答 -1", makeAssessment(gad7Answers: [-1]), .invalidAssessmentValue),
+            ("GAD回答 4", makeAssessment(gad7Answers: [4]), .invalidAssessmentValue),
+            ("PHQスコア -1", makeAssessment(phq9Score: -1), .invalidAssessmentValue),
+            ("PHQスコア 28", makeAssessment(phq9Score: 28), .invalidAssessmentValue),
+            ("GADスコア -1", makeAssessment(gad7Score: -1), .invalidAssessmentValue),
+            ("GADスコア 22", makeAssessment(gad7Score: 22), .invalidAssessmentValue),
+            (
+                "PHQ完了なのに回答なし",
+                makeAssessment(isPhq9Completed: true),
+                .invalidAssessmentValue
+            ),
+            (
+                "PHQスコアと回答合計が不一致",
+                makeAssessment(
+                    phq9Score: 1,
+                    phq9Answers: Array(repeating: 0, count: 9),
+                    isPhq9Completed: true
+                ),
+                .invalidAssessmentValue
+            ),
+            (
+                "GAD完了なのに回答なし",
+                makeAssessment(isGad7Completed: true),
+                .invalidAssessmentValue
+            ),
+            (
+                "GADスコアと回答合計が不一致",
+                makeAssessment(
+                    gad7Score: 1,
+                    gad7Answers: Array(repeating: 0, count: 7),
+                    isGad7Completed: true
+                ),
+                .invalidAssessmentValue
+            )
+        ]
+
+        for (name, assessment, expectedError) in invalidCases {
+            XCTContext.runActivity(named: name) { _ in
+                XCTAssertThrowsError(try validate(assessment)) { error in
+                    XCTAssertEqual(error as? DiaryArchiveValidationError, expectedError)
+                }
+            }
+        }
+    }
+
+    func testAssessmentValidationAcceptsValidBoundaries() throws {
+        let validCases = [
+            makeAssessment(
+                phq9Score: 0,
+                phq9Answers: Array(repeating: 0, count: 9),
+                isPhq9Completed: true
+            ),
+            makeAssessment(
+                phq9Score: 27,
+                phq9Answers: Array(repeating: 3, count: 9),
+                isPhq9Completed: true
+            ),
+            makeAssessment(
+                gad7Score: 0,
+                gad7Answers: Array(repeating: 0, count: 7),
+                isGad7Completed: true
+            ),
+            makeAssessment(
+                gad7Score: 21,
+                gad7Answers: Array(repeating: 3, count: 7),
+                isGad7Completed: true
+            )
+        ]
+
+        for assessment in validCases {
+            XCTAssertNoThrow(try validate(assessment))
+        }
+    }
+
+    func testAssessmentArrayLimitIsValidatedIndividually() {
+        let tooManyValues = Array(
+            repeating: 0,
+            count: DiaryArchiveLimits.maximumValuesPerArray + 1
         )
 
         XCTAssertThrowsError(
-            try DiaryArchiveCrypto.encrypt(archive: archive, password: password)
+            try validate(makeAssessment(phq9Answers: tooManyValues))
         ) { error in
-            XCTAssertEqual(
-                error as? DiaryArchiveValidationError,
-                .invalidAssessmentValue
+            XCTAssertEqual(error as? DiaryArchiveValidationError, .tooManyValues)
+        }
+        XCTAssertThrowsError(
+            try validate(makeAssessment(gad7Answers: tooManyValues))
+        ) { error in
+            XCTAssertEqual(error as? DiaryArchiveValidationError, .tooManyValues)
+        }
+    }
+
+    func testCancellationPreventsEncryptionResult() async throws {
+        let gate = EncryptionStartGate()
+        let archive = makeArchive()
+        let encryptionPassword = password
+        let operation = Task.detached(priority: .userInitiated) {
+            await gate.wait()
+            return try await DiaryArchiveCrypto.encrypt(
+                archive: archive,
+                password: encryptionPassword
             )
+        }
+
+        operation.cancel()
+        await gate.open()
+
+        do {
+            _ = try await operation.value
+            XCTFail("キャンセル済みの暗号化結果が返ってはいけません")
+        } catch is CancellationError {
+            // 期待するキャンセル結果。
+        } catch {
+            XCTFail("想定外のエラー: \(error)")
         }
     }
 
@@ -202,6 +292,39 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         )
     }
 
+    private func makeAssessment(
+        phq9Score: Int = 0,
+        gad7Score: Int = 0,
+        phq9Answers: [Int] = [],
+        gad7Answers: [Int] = [],
+        isPhq9Completed: Bool = false,
+        isGad7Completed: Bool = false
+    ) -> ArchivedMentalHealthAssessment {
+        ArchivedMentalHealthAssessment(
+            id: UUID(),
+            date: Date(timeIntervalSince1970: 1_785_484_800),
+            phq9Score: phq9Score,
+            gad7Score: gad7Score,
+            phq9Answers: phq9Answers,
+            gad7Answers: gad7Answers,
+            notes: "",
+            selectedTests: [],
+            isPhq9Completed: isPhq9Completed,
+            isGad7Completed: isGad7Completed,
+            ageGroupInterpretation: "",
+            userAge: 0
+        )
+    }
+
+    private func validate(_ assessment: ArchivedMentalHealthAssessment) throws {
+        try DiaryArchiveV1(
+            exportedAt: assessment.date,
+            moodEntries: [],
+            assessments: [assessment],
+            safetyChecks: []
+        ).validate()
+    }
+
     private func tamperWithCiphertext(in data: Data) throws -> Data {
         guard var text = String(data: data, encoding: .utf8),
               let markerRange = text.range(of: "\"ciphertext\":\"") else {
@@ -221,6 +344,26 @@ final class DiaryArchiveCryptoTests: XCTestCase {
 
     private enum TestError: Error {
         case cannotTamper
+    }
+}
+
+private actor EncryptionStartGate {
+    private var isOpen = false
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    func wait() async {
+        if isOpen {
+            return
+        }
+        await withCheckedContinuation { continuation in
+            self.continuation = continuation
+        }
+    }
+
+    func open() {
+        isOpen = true
+        continuation?.resume()
+        continuation = nil
     }
 }
 
