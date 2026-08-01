@@ -92,9 +92,9 @@ private enum ArticleSources {
     )
 
     static let dateDV = ArticleSource(
-        title: "デートDVについて",
+        title: "デートDVって?",
         organization: "内閣府男女共同参画局",
-        urlString: "https://www.gender.go.jp/policy/no_violence/date_dv/batterer.html"
+        urlString: "https://www.gender.go.jp/policy/no_violence/date_dv/index.html"
     )
 
     static let youngSexualViolence = ArticleSource(
