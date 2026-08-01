@@ -9,16 +9,18 @@
 - [x] Foundation #20 — [PR #23](https://github.com/VIUK-Light/Yohaku-Journal/pull/23)
 - [x] 回帰テスト #2 — [PR #25](https://github.com/VIUK-Light/Yohaku-Journal/pull/25)
 - [x] アクセシビリティ #3 — [PR #26](https://github.com/VIUK-Light/Yohaku-Journal/pull/26)
-- [ ] Architecture #18 — [PR #31](https://github.com/VIUK-Light/Yohaku-Journal/pull/31)
-- [ ] Insights #19 — [PR #32](https://github.com/VIUK-Light/Yohaku-Journal/pull/32)
-- [ ] Safety #13 — [PR #33](https://github.com/VIUK-Light/Yohaku-Journal/pull/33)
-- [ ] Content #17 — [PR #34](https://github.com/VIUK-Light/Yohaku-Journal/pull/34)
-- [ ] Safety #21 — [PR #29](https://github.com/VIUK-Light/Yohaku-Journal/pull/29)
-- [ ] Backup policy #4 — [PR #28](https://github.com/VIUK-Light/Yohaku-Journal/pull/28)
-- [ ] Data protection #22 — [PR #27](https://github.com/VIUK-Light/Yohaku-Journal/pull/27)
-- [ ] Diary #16 — [PR #30](https://github.com/VIUK-Light/Yohaku-Journal/pull/30)
-- [ ] Platform QA #1
-- [ ] Release #15
+- [x] Architecture #18 — [PR #31](https://github.com/VIUK-Light/Yohaku-Journal/pull/31)
+- [x] Insights #19 — [PR #32](https://github.com/VIUK-Light/Yohaku-Journal/pull/32)
+- [x] Safety #13 — [PR #33](https://github.com/VIUK-Light/Yohaku-Journal/pull/33)
+- [x] Content #17 — [PR #34](https://github.com/VIUK-Light/Yohaku-Journal/pull/34)
+- [x] Safety #21 — [PR #29](https://github.com/VIUK-Light/Yohaku-Journal/pull/29)
+- [x] Backup policy #4 — [PR #28](https://github.com/VIUK-Light/Yohaku-Journal/pull/28)
+- [x] Data protection #22 — [PR #27](https://github.com/VIUK-Light/Yohaku-Journal/pull/27)
+- [x] Diary #16 — [PR #30](https://github.com/VIUK-Light/Yohaku-Journal/pull/30), [PR #40](https://github.com/VIUK-Light/Yohaku-Journal/pull/40), [PR #41](https://github.com/VIUK-Light/Yohaku-Journal/pull/41)
+- [ ] Platform QA #1 — 実装 [PR #39](https://github.com/VIUK-Light/Yohaku-Journal/pull/39)、ウィンドウ修正 [PR #42](https://github.com/VIUK-Light/Yohaku-Journal/pull/42)
+- [x] Release #15 — [PR #35](https://github.com/VIUK-Light/Yohaku-Journal/pull/35), [PR #41](https://github.com/VIUK-Light/Yohaku-Journal/pull/41)
+
+実装PR #27〜#41はmainへマージ済みです。#42はレビュー中で、Platform QAの完了とは扱いません。
 
 CIでは、Mac Catalystを有効にし、Mac上のDesigned for iPad経路を無効にし、Launch Screen設定を維持していることを静的に検査します。これは実機・シミュレータでのレイアウト確認の代替ではありません。
 
@@ -35,11 +37,11 @@ CIでは、Mac Catalystを有効にし、Mac上のDesigned for iPad経路を無�
 
 ## データとプライバシー
 
-- [ ] `Documentation/Privacy.md`と最終版の実装が一致する
+- [x] `Documentation/Privacy.md`とmainの実装が一致する
 - [ ] 広告、解析SDK、アカウント、クラウド同期がないことを監査
 - [ ] 外部リンクは利用者の操作時だけ開く
 - [ ] App Store Connectのプライバシー申告を最終バイナリと照合
-- [ ] バックアップ機能を「利用可能」と案内するのは#22マージ後だけにする
+- [x] バックアップ機能の案内は#22マージ後の実装と一致している
 
 ## UIとアクセシビリティ
 
