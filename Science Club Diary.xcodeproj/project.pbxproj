@@ -17,9 +17,15 @@
 		36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DF0CB09392151B28AD6F7 /* MoodEntry.swift */; };
 		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
 		4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */; };
+		4E1B7802B2B5EF4B2D4A3FCE /* DiaryDataServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB47BF0718CECD2945E63F88 /* DiaryDataServices.swift */; };
 		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
+		5BCB3B2E9D1F2B7623D5F647 /* DataProtectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86005C9E1A4F5E4ED1DAD1CE /* DataProtectionTests.swift */; };
+		5F68AE97C2679FB30700D896 /* AppLockController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DC6ACD722F54642C2A7AD78 /* AppLockController.swift */; };
+		5FC352AC093F2FA581D8EF18 /* DiaryArchive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06E6AC99178ECED8285E1DAE /* DiaryArchive.swift */; };
+		64FB40F09C803AC65FF37649 /* DataPrivacySettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 418D76658E5C97DC3A74994C /* DataPrivacySettingsView.swift */; };
 		689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB67B6060F19002D6ACE327 /* ArticleListView.swift */; };
 		80353EE0C472813C80F63462 /* SelectableButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 84991957D3523758A1F8DA62 /* SelectableButton.swift */; };
+		C29FA6325E9771B0C4116DDB /* DiaryArchiveCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76E2903BD3825A4EF44B72B2 /* DiaryArchiveCrypto.swift */; };
 		DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */; };
 		FFC9005D50FB65471D797435 /* MentalHealthCheckView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */; };
 /* End PBXBuildFile section */
@@ -35,20 +41,27 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		06E6AC99178ECED8285E1DAE /* DiaryArchive.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryArchive.swift; sourceTree = "<group>"; };
 		0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryDraft.swift; sourceTree = "<group>"; };
 		3115FFDFC83C98AD90565965 /* AppInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppInfoView.swift; sourceTree = "<group>"; };
 		35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryLineIcon.swift; sourceTree = "<group>"; };
+		418D76658E5C97DC3A74994C /* DataPrivacySettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataPrivacySettingsView.swift; sourceTree = "<group>"; };
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
 		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
+		55EB4A38A635C50B095AE7AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6284A7417F6F4E775C212446 /* MoodJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodJournalView.swift; sourceTree = "<group>"; };
 		736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthAssessment.swift; sourceTree = "<group>"; };
+		76E2903BD3825A4EF44B72B2 /* DiaryArchiveCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryArchiveCrypto.swift; sourceTree = "<group>"; };
 		787DF0CB09392151B28AD6F7 /* MoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntry.swift; sourceTree = "<group>"; };
+		7DC6ACD722F54642C2A7AD78 /* AppLockController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLockController.swift; sourceTree = "<group>"; };
 		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
+		86005C9E1A4F5E4ED1DAD1CE /* DataProtectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataProtectionTests.swift; sourceTree = "<group>"; };
 		8ECE76C81883ED0739846B7B /* Science Club DiaryTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = "Science Club DiaryTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalEntryPersistenceTests.swift; sourceTree = "<group>"; };
 		9B7674FA667D8FF29B01AF59 /* RecordKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordKind.swift; sourceTree = "<group>"; };
 		9E9F747607977F6DE87AC4BC /* Science Club Diary.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Science Club Diary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSafetyCheckRecord.swift; sourceTree = "<group>"; };
+		DB47BF0718CECD2945E63F88 /* DiaryDataServices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryDataServices.swift; sourceTree = "<group>"; };
 		DE6F843B5B12F943D580F66D /* NewMoodEntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMoodEntryView.swift; sourceTree = "<group>"; };
 		E3602C212FA0CF313F99C3FE /* DiaryApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiaryApp.swift; sourceTree = "<group>"; };
 		FFB67B6060F19002D6ACE327 /* ArticleListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleListView.swift; sourceTree = "<group>"; };
@@ -67,9 +80,15 @@
 			isa = PBXGroup;
 			children = (
 				3115FFDFC83C98AD90565965 /* AppInfoView.swift */,
+				7DC6ACD722F54642C2A7AD78 /* AppLockController.swift */,
 				FFB67B6060F19002D6ACE327 /* ArticleListView.swift */,
+				418D76658E5C97DC3A74994C /* DataPrivacySettingsView.swift */,
 				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
+				06E6AC99178ECED8285E1DAE /* DiaryArchive.swift */,
+				76E2903BD3825A4EF44B72B2 /* DiaryArchiveCrypto.swift */,
+				DB47BF0718CECD2945E63F88 /* DiaryDataServices.swift */,
 				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
+				55EB4A38A635C50B095AE7AF /* Info.plist */,
 				0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */,
 				AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */,
 				736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */,
@@ -87,6 +106,7 @@
 		877683AD2EB92AAA0D11D390 /* ScienceClubDiaryTests */ = {
 			isa = PBXGroup;
 			children = (
+				86005C9E1A4F5E4ED1DAD1CE /* DataProtectionTests.swift */,
 				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
 			);
 			path = ScienceClubDiaryTests;
@@ -188,8 +208,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */,
+				5F68AE97C2679FB30700D896 /* AppLockController.swift in Sources */,
 				689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */,
+				64FB40F09C803AC65FF37649 /* DataPrivacySettingsView.swift in Sources */,
 				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
+				5FC352AC093F2FA581D8EF18 /* DiaryArchive.swift in Sources */,
+				C29FA6325E9771B0C4116DDB /* DiaryArchiveCrypto.swift in Sources */,
+				4E1B7802B2B5EF4B2D4A3FCE /* DiaryDataServices.swift in Sources */,
 				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
 				DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */,
 				4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */,
@@ -208,6 +233,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5BCB3B2E9D1F2B7623D5F647 /* DataProtectionTests.swift in Sources */,
 				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -294,12 +320,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
 				DEVELOPMENT_TEAM = 34CN68272C;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Science Club Diary";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Diary/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -324,12 +346,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = NO;
 				DEVELOPMENT_TEAM = 34CN68272C;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Science Club Diary";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Diary/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

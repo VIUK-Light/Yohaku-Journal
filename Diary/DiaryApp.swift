@@ -87,20 +87,113 @@ extension View {
 
 @main
 struct ScienceClubDiaryApp: App {
+    @StateObject private var lockController: AppLockController
+    @StateObject private var protectionStatus: DiaryDataProtectionStatus
+
+    private let modelContainer: ModelContainer?
+    private let storeStartupError: String?
+
+    init() {
+        _lockController = StateObject(wrappedValue: AppLockController())
+
+        let schema = Schema([
+            MoodEntry.self,
+            MentalHealthAssessment.self,
+            LightSafetyCheckRecord.self
+        ])
+        let configuration = ModelConfiguration(
+            schema: schema,
+            cloudKitDatabase: .none
+        )
+        let initialProtection = DiaryFileProtectionService.prepareStore(
+            at: configuration.url
+        )
+
+        do {
+            let container = try ModelContainer(
+                for: schema,
+                configurations: [configuration]
+            )
+            modelContainer = container
+            storeStartupError = nil
+            _protectionStatus = StateObject(
+                wrappedValue: DiaryDataProtectionStatus(
+                    report: DiaryFileProtectionService.refreshProtection(
+                        at: initialProtection.storeURL
+                    )
+                )
+            )
+        } catch {
+            modelContainer = nil
+            storeStartupError = error.localizedDescription
+            _protectionStatus = StateObject(
+                wrappedValue: DiaryDataProtectionStatus(report: initialProtection)
+            )
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
-            MoodJournalView()
-                .tint(DiaryTheme.accent)
+            Group {
+                if let modelContainer {
+                    PrivacyProtectedRootView(lockController: lockController) {
+                        MoodJournalView()
+                            .tint(DiaryTheme.accent)
 #if targetEnvironment(macCatalyst)
-                .background(MacWindowConfigurator())
+                            .background(MacWindowConfigurator())
 #endif
+                    }
+                    .environmentObject(lockController)
+                    .environmentObject(protectionStatus)
+                    .modelContainer(modelContainer)
+                } else {
+                    DiaryStoreUnavailableView(
+                        detail: storeStartupError
+                            ?? "端末内の保存領域を開けませんでした。"
+                    )
+                }
+            }
         }
-        .modelContainer(for: [MoodEntry.self, MentalHealthAssessment.self, LightSafetyCheckRecord.self])
 #if targetEnvironment(macCatalyst)
         // Macでは縦長のiPhone画面にならないよう、横長の初期ウィンドウを指定する。
         .defaultSize(width: 1180, height: 760)
         .windowResizability(.contentMinSize)
 #endif
+    }
+}
+
+private struct DiaryStoreUnavailableView: View {
+    let detail: String
+
+    var body: some View {
+        ZStack {
+            DiaryTheme.canvas
+                .ignoresSafeArea()
+
+            VStack(spacing: 14) {
+                Image(systemName: "externaldrive.badge.exclamationmark")
+                    .font(.system(size: 42, weight: .regular))
+                    .foregroundStyle(DiaryTheme.emergency)
+
+                Text("端末内の記録を開けません")
+                    .font(.title3.weight(.bold))
+                    .foregroundStyle(DiaryTheme.ink)
+
+                Text("データを消したり、一時的な空の保存先へ切り替えたりせず停止しています。アプリを終了してもう一度開いてください。続く場合は、この表示内容を添えて開発者へ連絡してください。")
+                    .font(.subheadline)
+                    .foregroundStyle(DiaryTheme.muted)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+                    .multilineTextAlignment(.center)
+                    .textSelection(.enabled)
+            }
+            .frame(maxWidth: 480)
+            .padding(28)
+        }
     }
 }
 
