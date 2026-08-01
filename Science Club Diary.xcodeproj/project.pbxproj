@@ -13,6 +13,7 @@
 		2492133E776A2FCA3C883A1E /* MoodJournalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6284A7417F6F4E775C212446 /* MoodJournalView.swift */; };
 		26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */; };
 		283755B4C7F0EEE7E5C3BB7C /* RecordKind.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7674FA667D8FF29B01AF59 /* RecordKind.swift */; };
+		28F56B09068A65031E94054A /* PlatformLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55165900EB3D3DAB87EBE796 /* PlatformLayoutTests.swift */; };
 		2E0940853C79EE4237C7F7DC /* MentalHealthAssessment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */; };
 		36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DF0CB09392151B28AD6F7 /* MoodEntry.swift */; };
 		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
@@ -72,6 +73,7 @@
 		46062127FCC4D4FF7BE17066 /* SelfCheckEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelfCheckEvidence.swift; sourceTree = "<group>"; };
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
 		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
+		55165900EB3D3DAB87EBE796 /* PlatformLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformLayoutTests.swift; sourceTree = "<group>"; };
 		55EB4A38A635C50B095AE7AF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		6284A7417F6F4E775C212446 /* MoodJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodJournalView.swift; sourceTree = "<group>"; };
 		682278417B0E44A31C491750 /* ArticleCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCatalogTests.swift; sourceTree = "<group>"; };
@@ -160,6 +162,7 @@
 				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
 				1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */,
 				C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */,
+				55165900EB3D3DAB87EBE796 /* PlatformLayoutTests.swift */,
 				30F7A0E8CDED397DF2E5ED10 /* SelfCheckDefinitionTests.swift */,
 				295CD016C5E79DEC0FEA32C7 /* SupportResourceCatalogTests.swift */,
 			);
@@ -305,6 +308,7 @@
 				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
 				AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */,
 				AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */,
+				28F56B09068A65031E94054A /* PlatformLayoutTests.swift in Sources */,
 				D7DE643C163C3BF78A6EABFB /* SelfCheckDefinitionTests.swift in Sources */,
 				4E05E918340EAAC993A9D56C /* SupportResourceCatalogTests.swift in Sources */,
 			);
