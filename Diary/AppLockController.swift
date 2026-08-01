@@ -237,6 +237,7 @@ final class DiaryDataProtectionStatus: ObservableObject {
 struct PrivacyProtectedRootView<Content: View>: View {
     @Environment(\.scenePhase) private var scenePhase
     @ObservedObject var lockController: AppLockController
+    @ObservedObject var protectionStatus: DiaryDataProtectionStatus
     @ViewBuilder let content: () -> Content
 
     var body: some View {
@@ -250,11 +251,18 @@ struct PrivacyProtectedRootView<Content: View>: View {
             }
         }
         .onAppear {
-            lockController.handleScenePhase(scenePhase)
+            handleScenePhase(scenePhase)
         }
         .onChange(of: scenePhase) { _, phase in
-            lockController.handleScenePhase(phase)
+            handleScenePhase(phase)
         }
+    }
+
+    private func handleScenePhase(_ phase: ScenePhase) {
+        // SQLiteのWAL/SHMなどはModelContainerの作成後に現れるため、
+        // 起動時の一回だけでなく、保護データの利用可能性が変わる境界でも再確認する。
+        protectionStatus.refresh()
+        lockController.handleScenePhase(phase)
     }
 }
 

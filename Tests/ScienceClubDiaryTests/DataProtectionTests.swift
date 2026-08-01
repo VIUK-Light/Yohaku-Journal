@@ -816,6 +816,18 @@ final class AppDataProtectionConfigurationTests: XCTestCase {
 #endif
     }
 
+    func testStoreProtectionDoesNotReportSuccessBeforeStoreExists() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent("DiaryStoreProtectionTests-\(UUID().uuidString)")
+        let store = directory.appendingPathComponent("Diary.store")
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let report = DiaryFileProtectionService.prepareStore(at: store)
+
+        XCTAssertFalse(report.isProtected)
+        XCTAssertTrue(report.warning?.contains("保存ファイルがまだ作成されていない") == true)
+    }
+
     private func assertCompleteProtection(at url: URL) throws {
         let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
         let protection = attributes[.protectionKey]

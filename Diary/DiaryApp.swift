@@ -147,7 +147,10 @@ struct ScienceClubDiaryApp: App {
 
     var body: some Scene {
         WindowGroup {
-            PrivacyProtectedRootView(lockController: lockController) {
+            PrivacyProtectedRootView(
+                lockController: lockController,
+                protectionStatus: protectionStatus
+            ) {
                 if let modelContainer {
                     Group {
                         MoodJournalView()
