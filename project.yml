@@ -13,21 +13,37 @@ targets:
     platform: iOS
     sources:
       - path: Diary
+    info:
+      path: Diary/Info.plist
+      properties:
+        CFBundleDisplayName: Science Club Diary
+        LSApplicationCategoryType: public.app-category.lifestyle
+        NSFaceIDUsageDescription: 日記の記録を開くためにFace IDを使用します。
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: true
+          UISceneConfigurations: {}
+        UIApplicationSupportsIndirectInputEvents: true
+        UILaunchScreen: {}
+        UTExportedTypeDeclarations:
+          - UTTypeIdentifier: viuk.scienceclub.diary.backup
+            UTTypeDescription: Science Club Diary 暗号化バックアップ
+            UTTypeConformsTo:
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - yohakubackup
+              public.mime-type:
+                - application/vnd.viuk.scienceclub.diary.backup
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: viuk.scienceclub.diary
         DEVELOPMENT_TEAM: 34CN68272C
-        GENERATE_INFOPLIST_FILE: true
-        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
+        GENERATE_INFOPLIST_FILE: false
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.9"
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_LAUNCH_SCREEN: true
-        INFOPLIST_KEY_CFBundleDisplayName: Science Club Diary
-        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.lifestyle
-        INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents: true
-        INFOPLIST_KEY_UILaunchScreen_Generation: true
         SUPPORTS_MACCATALYST: true
         # MacではiPad互換版ではなく、Mac Catalyst版を起動する。
         # iPad実機・iPadシミュレータ向けの対応はTARGETED_DEVICE_FAMILYで維持する。
