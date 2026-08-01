@@ -123,9 +123,13 @@ struct SupportResourceRow: View {
 
 /// 危機回答の直後に、画面を移動せず確認できる短い相談先一覧。
 struct CompactSupportResourcesView: View {
-    private let resources = Array(
-        SupportResourceCatalog.resources(for: .immediate).prefix(2)
-    )
+    private var resources: [SupportResource] {
+        var resources = Array(SupportResourceCatalog.resources(for: .immediate).prefix(2))
+        if let anonymousChat = SupportResourceCatalog.resources.first(where: { $0.id == "anata-no-ibasho" }) {
+            resources.append(anonymousChat)
+        }
+        return resources
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
