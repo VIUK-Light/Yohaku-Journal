@@ -17,6 +17,7 @@
 		36AE8A2F7B6A3090E1A4D5DE /* MoodEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 787DF0CB09392151B28AD6F7 /* MoodEntry.swift */; };
 		3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3115FFDFC83C98AD90565965 /* AppInfoView.swift */; };
 		4A2AEF17A679F746F12DCBF0 /* LightSafetyCheckRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */; };
+		53A7B84421507F3D99562826 /* ArticleCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682278417B0E44A31C491750 /* ArticleCatalogTests.swift */; };
 		562D2906B7CC29FA25BCE353 /* MoodEntryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */; };
 		5655D1670B17C3B244B13747 /* JournalTimelineRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C356F40BD31F517932094 /* JournalTimelineRow.swift */; };
 		61F72810EB9AC9861E8AEFF4 /* JournalInsightsSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = C03CA4472E69FC6223102C64 /* JournalInsightsSnapshot.swift */; };
@@ -29,6 +30,7 @@
 		AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */; };
 		AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */; };
 		B58896F34741D464B7B41717 /* JournalTimeline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17495CDEA94E8866453E0700 /* JournalTimeline.swift */; };
+		C3B38D0B60A64AFE10058C3F /* ArticleCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF44C33972213DBDA58F6AB3 /* ArticleCatalog.swift */; };
 		C53A79F6835D05DC3AF9FDE3 /* JournalInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */; };
 		D7DE643C163C3BF78A6EABFB /* SelfCheckDefinitionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30F7A0E8CDED397DF2E5ED10 /* SelfCheckDefinitionTests.swift */; };
 		DA92D4526B3ABC5C81922F3D /* JournalEntryDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FC26E9BDCF336AFC1BF9CA1 /* JournalEntryDraft.swift */; };
@@ -57,6 +59,7 @@
 		5139FE05F53B4E6DC2309857 /* MentalHealthCheckView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthCheckView.swift; sourceTree = "<group>"; };
 		51FEEE81C1D7E919F55269F0 /* MoodEntryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntryDetailView.swift; sourceTree = "<group>"; };
 		6284A7417F6F4E775C212446 /* MoodJournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodJournalView.swift; sourceTree = "<group>"; };
+		682278417B0E44A31C491750 /* ArticleCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCatalogTests.swift; sourceTree = "<group>"; };
 		736D4583B5F462E4F68DE28D /* MentalHealthAssessment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MentalHealthAssessment.swift; sourceTree = "<group>"; };
 		787DF0CB09392151B28AD6F7 /* MoodEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoodEntry.swift; sourceTree = "<group>"; };
 		84991957D3523758A1F8DA62 /* SelectableButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableButton.swift; sourceTree = "<group>"; };
@@ -66,6 +69,7 @@
 		9B7674FA667D8FF29B01AF59 /* RecordKind.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordKind.swift; sourceTree = "<group>"; };
 		9E9F747607977F6DE87AC4BC /* Science Club Diary.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Science Club Diary.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC1A4A179C6C5AD18F515F3F /* LightSafetyCheckRecord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightSafetyCheckRecord.swift; sourceTree = "<group>"; };
+		AF44C33972213DBDA58F6AB3 /* ArticleCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArticleCatalog.swift; sourceTree = "<group>"; };
 		C03CA4472E69FC6223102C64 /* JournalInsightsSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsSnapshot.swift; sourceTree = "<group>"; };
 		C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalTimelineTests.swift; sourceTree = "<group>"; };
 		CE2CC58BEA14A62F0C87632E /* JournalInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalInsightsView.swift; sourceTree = "<group>"; };
@@ -91,6 +95,7 @@
 			isa = PBXGroup;
 			children = (
 				3115FFDFC83C98AD90565965 /* AppInfoView.swift */,
+				AF44C33972213DBDA58F6AB3 /* ArticleCatalog.swift */,
 				FFB67B6060F19002D6ACE327 /* ArticleListView.swift */,
 				E3602C212FA0CF313F99C3FE /* DiaryApp.swift */,
 				35560E136EBBB572EA27BDDC /* DiaryLineIcon.swift */,
@@ -120,6 +125,7 @@
 		877683AD2EB92AAA0D11D390 /* ScienceClubDiaryTests */ = {
 			isa = PBXGroup;
 			children = (
+				682278417B0E44A31C491750 /* ArticleCatalogTests.swift */,
 				9203DF0A1A46041927288D74 /* JournalEntryPersistenceTests.swift */,
 				1CCD74FC27A630B3F74674F8 /* JournalInsightsSnapshotTests.swift */,
 				C753B478DBD664B36A4B1207 /* JournalTimelineTests.swift */,
@@ -224,6 +230,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E5B94F0546772124A13DD68 /* AppInfoView.swift in Sources */,
+				C3B38D0B60A64AFE10058C3F /* ArticleCatalog.swift in Sources */,
 				689BEDFD326F61E85F04DE6A /* ArticleListView.swift in Sources */,
 				16B0C3E12A7628743703349E /* DiaryApp.swift in Sources */,
 				232A0DB811791AB215A84E83 /* DiaryLineIcon.swift in Sources */,
@@ -253,6 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				53A7B84421507F3D99562826 /* ArticleCatalogTests.swift in Sources */,
 				26EEF36BDA2F7F2EE7884A77 /* JournalEntryPersistenceTests.swift in Sources */,
 				AD6FF373D49AFB0B86D1AE73 /* JournalInsightsSnapshotTests.swift in Sources */,
 				AFF1FFB0BCEFE6E9A24D26F9 /* JournalTimelineTests.swift in Sources */,
