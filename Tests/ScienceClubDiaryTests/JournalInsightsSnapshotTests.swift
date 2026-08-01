@@ -54,6 +54,32 @@ final class JournalInsightsSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.omittedEventTagCount, 2)
     }
 
+    func testWeekRangeIncludesTodayAndSixPreviousLocalDaysOnly() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let today = calendar.startOfDay(for: now)
+        let date = { (offset: Int) in
+            calendar.date(byAdding: .day, value: offset, to: today)!
+        }
+        let entries = [
+            makeEntry(date: date(0).addingTimeInterval(3_600), score: 2, tag: "学校"),
+            makeEntry(date: date(0).addingTimeInterval(7_200), score: 6, tag: "学校"),
+            makeEntry(date: date(-1).addingTimeInterval(3_600), score: 4, tag: "学校"),
+            makeEntry(date: date(-6).addingTimeInterval(3_600), score: 5, tag: "学校"),
+            makeEntry(date: date(-7).addingTimeInterval(3_600), score: 7, tag: "学校")
+        ]
+
+        let snapshot = JournalInsightsCalculator.make(
+            entries: entries,
+            range: .week,
+            now: now,
+            calendar: calendar
+        )
+
+        XCTAssertEqual(snapshot.totalEntries, 4)
+        XCTAssertEqual(snapshot.moodTrend.count, 3)
+        XCTAssertEqual(snapshot.moodTrend.last?.averageScore, 4)
+    }
+
     private func makeEntry(date: Date, score: Int, tag: String) -> MoodEntry {
         let entry = MoodEntry()
         entry.date = date
