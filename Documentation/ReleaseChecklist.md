@@ -20,6 +20,8 @@
 - [ ] Platform QA #1
 - [ ] Release #15
 
+CIでは、Mac Catalystを有効にし、Mac上のDesigned for iPad経路を無効にし、Launch Screen設定を維持していることを静的に検査します。これは実機・シミュレータでのレイアウト確認の代替ではありません。
+
 ## 機能と安全性
 
 - [ ] 新規記録、既存記録編集、削除、キャンセル、保存失敗を確認

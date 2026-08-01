@@ -36,6 +36,12 @@ jobs:
           test -s Documentation/ReleaseChecklist.md
           test -s project.yml
 
+      - name: Check platform routing safeguards
+        run: |
+          grep -Eq '^        SUPPORTS_MACCATALYST: true$' project.yml
+          grep -Eq '^        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: false$' project.yml
+          grep -Eq '^        SUPPORTS_LAUNCH_SCREEN: true$' project.yml
+
   swift-tests:
     name: Swift Tests
     runs-on: macos-15
