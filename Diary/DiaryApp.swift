@@ -55,7 +55,27 @@ enum DiaryTheme {
 
 enum DiaryRuntime {
     static let macWindowDefaultSize = CGSize(width: 1100, height: 700)
-    static let macWindowMinimumSize = CGSize(width: 900, height: 600)
+    // Mac Catalystでは2カラムを無理なく表示できる最小サイズを先に確保する。
+    // 旧版の保存済み縦長ウィンドウは、初回表示時にこの比率へ戻す。
+    static let macWindowMinimumSize = CGSize(width: 1024, height: 700)
+
+    /// 保存済みのウィンドウサイズを、Mac Catalystの初回表示に適した値へ変換する。
+    /// 最小サイズを満たしているウィンドウは、利用者が選んだサイズとして変更しない。
+    static func normalizedMacWindowSize(for currentSize: CGSize) -> CGSize? {
+        guard currentSize.width < macWindowMinimumSize.width
+                || currentSize.height < macWindowMinimumSize.height else {
+            return nil
+        }
+
+        if currentSize.width < currentSize.height {
+            return macWindowDefaultSize
+        }
+
+        return CGSize(
+            width: max(currentSize.width, macWindowMinimumSize.width),
+            height: max(currentSize.height, macWindowMinimumSize.height)
+        )
+    }
 
     static var isMacWindow: Bool {
 #if targetEnvironment(macCatalyst)
@@ -250,12 +270,18 @@ private struct MacWindowConfigurator: UIViewRepresentable {
 
         windowScene.sizeRestrictions?.minimumSize = minimumSize
 
-        var frame = window.frame
-        if frame.width < minimumSize.width || frame.height < minimumSize.height {
-            frame.size.width = max(frame.width, minimumSize.width)
-            frame.size.height = max(frame.height, minimumSize.height)
-            window.frame = frame
+        let currentSize = window.frame.size
+        guard let targetSize = DiaryRuntime.normalizedMacWindowSize(for: currentSize) else {
+            return
         }
+
+        // 旧版で保存された縦長サイズを単に幅だけ広げると、縦長のまま残る。
+        // その場合だけ標準の横長サイズへ戻し、通常の手動リサイズは尊重する。
+        var targetFrame = window.frame
+        targetFrame.origin.x -= (targetSize.width - currentSize.width) / 2
+        targetFrame.origin.y -= (targetSize.height - currentSize.height) / 2
+        targetFrame.size = targetSize
+        window.setFrame(targetFrame, display: true, animate: false)
     }
 }
 #endif
