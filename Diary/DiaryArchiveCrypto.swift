@@ -1,5 +1,6 @@
 import CommonCrypto
 import CryptoKit
+import Darwin
 import Foundation
 import Security
 import SwiftUI
@@ -45,6 +46,13 @@ enum DiaryArchivePasswordPolicy {
             throw DiaryArchiveCryptoError.passwordTooLong
         }
     }
+
+    /// 復号時は、バックアップ作成時の最小文字数を将来変更しても旧形式を開けるようにする。
+    static func validateForDecryption(_ password: String) throws {
+        guard password.utf8.count <= maximumUTF8ByteCount else {
+            throw DiaryArchiveCryptoError.passwordTooLong
+        }
+    }
 }
 
 enum DiaryArchiveCryptoError: Error, Equatable, LocalizedError {
@@ -80,6 +88,8 @@ enum DiaryArchiveCryptoError: Error, Equatable, LocalizedError {
 /// PBKDF2-HMAC-SHA256で鍵を作り、AES-256-GCMで内容とヘッダーを認証付き暗号化する。
 enum DiaryArchiveCrypto {
     static let currentIterations = 600_000
+    /// 旧バックアップを将来も受け入れるため、生成時の反復回数とは分離して管理する。
+    static let minimumAcceptedIterations = 600_000
     static let saltByteCount = 16
     static let keyByteCount = 32
     static let nonceByteCount = 12
@@ -151,7 +161,7 @@ enum DiaryArchiveCrypto {
         guard encryptedData.count <= DiaryArchiveLimits.maximumEncryptedFileBytes else {
             throw DiaryArchiveCryptoError.fileTooLarge
         }
-        try DiaryArchivePasswordPolicy.validate(password)
+        try DiaryArchivePasswordPolicy.validateForDecryption(password)
 
         let envelope: EncryptedDiaryArchiveEnvelope
         do {
@@ -244,12 +254,8 @@ enum DiaryArchiveCrypto {
         var passwordBytes = Array(normalizedPassword.utf8)
         var derivedBytes = [UInt8](repeating: 0, count: keyByteCount)
         defer {
-            passwordBytes.withUnsafeMutableBytes { buffer in
-                buffer.initializeMemory(as: UInt8.self, repeating: 0)
-            }
-            _ = derivedBytes.withUnsafeMutableBytes { buffer in
-                buffer.initializeMemory(as: UInt8.self, repeating: 0)
-            }
+            securelyClear(&passwordBytes)
+            securelyClear(&derivedBytes)
         }
 
         let status: Int32 = derivedBytes.withUnsafeMutableBytes { derivedBuffer in
@@ -290,7 +296,7 @@ enum DiaryArchiveCrypto {
               envelope.header.formatVersion == EncryptedDiaryArchiveHeader.currentFormatVersion,
               envelope.header.kdfAlgorithm == EncryptedDiaryArchiveHeader.kdfName,
               envelope.header.cipher == EncryptedDiaryArchiveHeader.cipherName,
-              envelope.header.iterations >= currentIterations,
+              envelope.header.iterations >= minimumAcceptedIterations,
               envelope.header.iterations <= maximumSupportedIterations,
               envelope.header.salt.count == saltByteCount,
               envelope.nonce.count == nonceByteCount,
@@ -306,6 +312,13 @@ enum DiaryArchiveCrypto {
             throw DiaryArchiveCryptoError.randomGenerationFailed
         }
         return Data(bytes)
+    }
+
+    private static func securelyClear(_ bytes: inout [UInt8]) {
+        bytes.withUnsafeMutableBytes { buffer in
+            guard let baseAddress = buffer.baseAddress else { return }
+            _ = memset_s(baseAddress, buffer.count, 0, buffer.count)
+        }
     }
 
     private static func canonicalEncoder() -> JSONEncoder {
@@ -333,7 +346,7 @@ enum DiaryArchiveCrypto {
 
 extension UTType {
     static let yohakuJournalBackup = UTType(
-        exportedAs: "org.viuk-light.yohaku-journal.backup",
+        exportedAs: "viuk.scienceclub.diary.backup",
         conformingTo: .data
     )
 }

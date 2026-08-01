@@ -47,11 +47,28 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         )
 
         XCTAssertNotEqual(encrypted, try JSONEncoder().encode(archive))
+        for secret in ["暗号化するメモ", "話せたこと", "事実ベースの振り返り"] {
+            XCTAssertNil(
+                encrypted.range(of: Data(secret.utf8)),
+                "平文「\(secret)」が暗号化データに残っています。"
+            )
+        }
         XCTAssertEqual(metadata.formatVersion, 1)
         XCTAssertEqual(metadata.kdfAlgorithm, "PBKDF2-HMAC-SHA256")
         XCTAssertEqual(metadata.iterations, 600_000)
         XCTAssertEqual(metadata.cipher, "AES-256-GCM")
         XCTAssertEqual(decrypted, archive)
+    }
+
+    func testDecryptionPasswordPolicyKeepsLegacyShortPasswordsReadable() throws {
+        XCTAssertNoThrow(try DiaryArchivePasswordPolicy.validateForDecryption("short"))
+        XCTAssertThrowsError(
+            try DiaryArchivePasswordPolicy.validateForDecryption(
+                String(repeating: "a", count: DiaryArchivePasswordPolicy.maximumUTF8ByteCount + 1)
+            )
+        ) { error in
+            XCTAssertEqual(error as? DiaryArchiveCryptoError, .passwordTooLong)
+        }
     }
 
     func testWrongPasswordDoesNotReturnPlaintext() async throws {
@@ -735,8 +752,16 @@ final class AppDataProtectionConfigurationTests: XCTestCase {
             backupType["UTTypeTagSpecification"] as? [String: Any]
         )
         XCTAssertEqual(
+            backupType["UTTypeDescription"] as? String,
+            "Science Club Diary 暗号化バックアップ"
+        )
+        XCTAssertEqual(
             tags["public.filename-extension"] as? [String],
             ["yohakubackup"]
+        )
+        XCTAssertEqual(
+            tags["public.mime-type"] as? [String],
+            ["application/vnd.viuk.scienceclub.diary.backup"]
         )
     }
 

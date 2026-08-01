@@ -9,6 +9,7 @@ struct DataPrivacySettingsView: View {
 
     @State private var counts = DiaryDataCounts.zero
     @State private var isWorking = false
+    @State private var workMessage = "処理中…"
     @State private var pendingBackup: PendingBackup?
     @State private var pendingEncryptedRestore: PendingEncryptedRestore?
     @State private var pendingRestore: PendingRestore?
@@ -33,11 +34,11 @@ struct DataPrivacySettingsView: View {
                 ZStack {
                     Color.black.opacity(0.12)
                         .ignoresSafeArea()
-                    ProgressView("処理中…")
+                    ProgressView(workMessage)
                         .padding(20)
                         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 16))
                 }
-                .accessibilityLabel("処理中")
+                .accessibilityLabel(workMessage)
             }
         }
         .task {
@@ -225,6 +226,7 @@ struct DataPrivacySettingsView: View {
     private func changeAppLockSetting() {
         Task {
             isWorking = true
+            workMessage = "端末認証を確認しています…"
             defer { isWorking = false }
             if lockController.isEnabled {
                 _ = await lockController.disableLock()
@@ -237,11 +239,13 @@ struct DataPrivacySettingsView: View {
     private func beginBackup() {
         guard !isWorking else { return }
         isWorking = true
+        workMessage = "記録をバックアップにまとめています…"
+        let container = modelContext.container
         Task { @MainActor in
             await Task.yield()
             defer { isWorking = false }
             do {
-                let archive = try DiaryArchiveDataService.makeArchive(in: modelContext)
+                let archive = try await DiaryArchiveDataService.makeArchive(in: container)
                 pendingBackup = PendingBackup(archive: archive)
             } catch {
                 showError(title: "バックアップを準備できませんでした", error: error)
@@ -277,6 +281,7 @@ struct DataPrivacySettingsView: View {
         case .success(let urls):
             guard let url = urls.first else { return }
             isWorking = true
+            workMessage = "バックアップを読み込んでいます…"
             Task {
                 defer { isWorking = false }
                 do {
@@ -316,6 +321,7 @@ struct DataPrivacySettingsView: View {
     ) -> Bool {
         guard !isWorking else { return false }
         isWorking = true
+        workMessage = "記録を復元しています…"
         Task { @MainActor in
             await Task.yield()
             defer { isWorking = false }
@@ -341,6 +347,7 @@ struct DataPrivacySettingsView: View {
     private func performFullDeletion() -> Bool {
         guard !isWorking else { return false }
         isWorking = true
+        workMessage = "記録を削除しています…"
         Task { @MainActor in
             await Task.yield()
             defer { isWorking = false }

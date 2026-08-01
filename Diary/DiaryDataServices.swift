@@ -40,40 +40,16 @@ enum DiaryArchiveDataService {
         in context: ModelContext,
         exportedAt: Date = Date()
     ) throws -> DiaryArchiveV1 {
-        if context.hasChanges {
-            try context.save()
-        }
+        try DiaryArchiveSnapshotBuilder.makeArchive(in: context, exportedAt: exportedAt)
+    }
 
-        var moodDescriptor = FetchDescriptor<MoodEntry>(
-            sortBy: [SortDescriptor(\MoodEntry.date, order: .forward)]
-        )
-        moodDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
-        var assessmentDescriptor = FetchDescriptor<MentalHealthAssessment>(
-            sortBy: [SortDescriptor(\MentalHealthAssessment.date, order: .forward)]
-        )
-        assessmentDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
-        var safetyDescriptor = FetchDescriptor<LightSafetyCheckRecord>(
-            sortBy: [SortDescriptor(\LightSafetyCheckRecord.date, order: .forward)]
-        )
-        safetyDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
-
-        let moodEntries = try context.fetch(moodDescriptor)
-        let assessments = try context.fetch(assessmentDescriptor)
-        let safetyChecks = try context.fetch(safetyDescriptor)
-        guard moodEntries.count <= DiaryArchiveLimits.maximumRecordsPerType,
-              assessments.count <= DiaryArchiveLimits.maximumRecordsPerType,
-              safetyChecks.count <= DiaryArchiveLimits.maximumRecordsPerType else {
-            throw DiaryArchiveValidationError.tooManyRecords
-        }
-
-        let archive = DiaryArchiveV1(
-            exportedAt: exportedAt,
-            moodEntries: moodEntries.map(ArchivedMoodEntry.init(entry:)),
-            assessments: assessments.map(ArchivedMentalHealthAssessment.init(assessment:)),
-            safetyChecks: safetyChecks.map(ArchivedSafetyCheck.init(record:))
-        )
-        try archive.validate()
-        return archive
+    /// 保存用のModelContextをMainActorから持ち出さず、専用のModelActorで読み取る。
+    static func makeArchive(
+        in container: ModelContainer,
+        exportedAt: Date = Date()
+    ) async throws -> DiaryArchiveV1 {
+        let worker = DiaryArchiveModelActor(modelContainer: container)
+        return try await worker.makeArchive(exportedAt: exportedAt)
     }
 
     static func preview(
@@ -303,6 +279,55 @@ enum DiaryArchiveDataService {
     }
 }
 
+@ModelActor
+private actor DiaryArchiveModelActor {
+    func makeArchive(exportedAt: Date) throws -> DiaryArchiveV1 {
+        try DiaryArchiveSnapshotBuilder.makeArchive(in: modelContext, exportedAt: exportedAt)
+    }
+}
+
+private enum DiaryArchiveSnapshotBuilder {
+    static func makeArchive(
+        in context: ModelContext,
+        exportedAt: Date
+    ) throws -> DiaryArchiveV1 {
+        if context.hasChanges {
+            try context.save()
+        }
+
+        var moodDescriptor = FetchDescriptor<MoodEntry>(
+            sortBy: [SortDescriptor(\MoodEntry.date, order: .forward)]
+        )
+        moodDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
+        var assessmentDescriptor = FetchDescriptor<MentalHealthAssessment>(
+            sortBy: [SortDescriptor(\MentalHealthAssessment.date, order: .forward)]
+        )
+        assessmentDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
+        var safetyDescriptor = FetchDescriptor<LightSafetyCheckRecord>(
+            sortBy: [SortDescriptor(\LightSafetyCheckRecord.date, order: .forward)]
+        )
+        safetyDescriptor.fetchLimit = DiaryArchiveLimits.maximumRecordsPerType + 1
+
+        let moodEntries = try context.fetch(moodDescriptor)
+        let assessments = try context.fetch(assessmentDescriptor)
+        let safetyChecks = try context.fetch(safetyDescriptor)
+        guard moodEntries.count <= DiaryArchiveLimits.maximumRecordsPerType,
+              assessments.count <= DiaryArchiveLimits.maximumRecordsPerType,
+              safetyChecks.count <= DiaryArchiveLimits.maximumRecordsPerType else {
+            throw DiaryArchiveValidationError.tooManyRecords
+        }
+
+        let archive = DiaryArchiveV1(
+            exportedAt: exportedAt,
+            moodEntries: moodEntries.map(ArchivedMoodEntry.init(entry:)),
+            assessments: assessments.map(ArchivedMentalHealthAssessment.init(assessment:)),
+            safetyChecks: safetyChecks.map(ArchivedSafetyCheck.init(record:))
+        )
+        try archive.validate()
+        return archive
+    }
+}
+
 enum DiaryArchiveFileReader {
     static func readEncryptedData(from url: URL) throws -> Data {
         let didAccess = url.startAccessingSecurityScopedResource()
@@ -342,11 +367,14 @@ struct DiaryFileProtectionReport: Equatable, Sendable {
 
 enum DiaryFileProtectionError: Error, Equatable, LocalizedError {
     case protectionCouldNotBeConfirmed
+    case storeNotCreated
 
     var errorDescription: String? {
         switch self {
         case .protectionCouldNotBeConfirmed:
             return "OSから完全保護の適用を確認できませんでした。"
+        case .storeNotCreated:
+            return "保存ファイルがまだ作成されていないため、保護状態を確認できません。"
         }
     }
 }
@@ -374,20 +402,7 @@ enum DiaryFileProtectionService {
     }
 
     static func refreshProtection(at storeURL: URL) -> DiaryFileProtectionReport {
-        do {
-            try applyCompleteProtectionToStore(at: storeURL)
-            return DiaryFileProtectionReport(
-                storeURL: storeURL,
-                isProtected: true,
-                warning: nil
-            )
-        } catch {
-            return DiaryFileProtectionReport(
-                storeURL: storeURL,
-                isProtected: false,
-                warning: "端末内ファイルの追加保護を確認できませんでした: \(error.localizedDescription)"
-            )
-        }
+        prepareStore(at: storeURL)
     }
 
     static func applyCompleteProtection(to url: URL) throws {
@@ -405,6 +420,10 @@ enum DiaryFileProtectionService {
     }
 
     private static func applyCompleteProtectionToStore(at storeURL: URL) throws {
+        guard FileManager.default.fileExists(atPath: storeURL.path) else {
+            throw DiaryFileProtectionError.storeNotCreated
+        }
+
         let directory = storeURL.deletingLastPathComponent()
         try FileManager.default.createDirectory(
             at: directory,
@@ -418,8 +437,23 @@ enum DiaryFileProtectionService {
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         )
-        for file in files where file.lastPathComponent.hasPrefix(storeURL.lastPathComponent) {
-            try applyCompleteProtection(to: file)
+        let storeFiles = files.filter { file in
+            file.lastPathComponent.hasPrefix(storeURL.lastPathComponent)
+        }
+        guard storeFiles.contains(where: { $0.standardizedFileURL == storeURL.standardizedFileURL }) else {
+            throw DiaryFileProtectionError.storeNotCreated
+        }
+
+        var firstError: Error?
+        for file in storeFiles {
+            do {
+                try applyCompleteProtection(to: file)
+            } catch {
+                firstError = firstError ?? error
+            }
+        }
+        if let firstError {
+            throw firstError
         }
     }
 }

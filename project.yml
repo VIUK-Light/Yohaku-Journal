@@ -25,15 +25,15 @@ targets:
         UIApplicationSupportsIndirectInputEvents: true
         UILaunchScreen: {}
         UTExportedTypeDeclarations:
-          - UTTypeIdentifier: org.viuk-light.yohaku-journal.backup
-            UTTypeDescription: Yohaku Journal 暗号化バックアップ
+          - UTTypeIdentifier: viuk.scienceclub.diary.backup
+            UTTypeDescription: Science Club Diary 暗号化バックアップ
             UTTypeConformsTo:
               - public.data
             UTTypeTagSpecification:
               public.filename-extension:
                 - yohakubackup
               public.mime-type:
-                - application/vnd.viuk-light.yohaku-journal.backup
+                - application/vnd.viuk.scienceclub.diary.backup
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: viuk.scienceclub.diary
