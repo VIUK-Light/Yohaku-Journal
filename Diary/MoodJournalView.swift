@@ -21,6 +21,7 @@ struct MoodJournalView: View {
 
     @State private var showingArticles = false
     @State private var showingMentalHealthCheck = false
+    @State private var showingSupportResources = false
     @State private var showingAppInfo = false
     @State private var entryPendingDeletion: MoodEntry?
     @State private var showingDeletionError = false
@@ -179,6 +180,12 @@ struct MoodJournalView: View {
                             } label: {
                                 Label("セルフチェック", systemImage: "list.bullet.clipboard")
                             }
+
+                            Button {
+                                showingSupportResources = true
+                            } label: {
+                                Label("相談先", systemImage: "person.2")
+                            }
                         } label: {
                             Image(systemName: "ellipsis.circle")
                         }
@@ -191,6 +198,9 @@ struct MoodJournalView: View {
             }
             .sheet(isPresented: $showingMentalHealthCheck) {
                 MentalHealthCheckView()
+            }
+            .sheet(isPresented: $showingSupportResources) {
+                SupportResourcesView()
             }
             .sheet(isPresented: $showingAppInfo) {
                 AppInfoView()
