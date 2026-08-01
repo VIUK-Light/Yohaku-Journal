@@ -105,6 +105,13 @@ struct AppInfoView: View {
                 title: "医療的な診断ではありません",
                 detail: "セルフチェックの結果は、医療機関による診断や治療の代わりにはなりません。"
             )
+
+            NavigationLink {
+                DataPrivacySettingsView()
+            } label: {
+                Label("プライバシーとデータを管理", systemImage: "lock.shield")
+            }
+            .foregroundStyle(DiaryTheme.accent)
         }
     }
 
