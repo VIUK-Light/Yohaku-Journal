@@ -60,4 +60,14 @@ final class ArticleCatalogTests: XCTestCase {
             ArticleCatalog.articles.map(\.id)
         )
     }
+
+    func testBoundaryArticleUsesTheOfficialYouthFacingDatingViolenceSource() {
+        let article = ArticleCatalog.articles.first { $0.id == "boundaries-unreturned-affection" }
+        let source = article?.metadata.sources.first {
+            $0.organization == "内閣府男女共同参画局"
+        }
+
+        XCTAssertEqual(source?.url.absoluteString, "https://www.gender.go.jp/policy/no_violence/date_dv/index.html")
+        XCTAssertEqual(source?.title, "デートDVって?")
+    }
 }
