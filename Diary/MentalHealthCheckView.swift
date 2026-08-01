@@ -379,163 +379,64 @@ struct MentalHealthCheckView: View {
     
     // 結果表示画面のビュー
     @ViewBuilder
+    /// 独自チェックは診断カードではなく、回答内容を眺める事実ベースの結果にする。
+    @ViewBuilder
     private var resultView: some View {
-        ScrollView { // 結果表示もスクロール可能にする
-            // 結果表示コンテンツの垂直スタック
-            VStack(spacing: 24) {
-                Text("振り返りの記録") // 結果画面のタイトル
-                    .font(.largeTitle.bold()) // 大きく太字で表示
-                
-                // 選択されたテストに基づいて、対応する結果カードを表示
-                if selectedTests.contains(.phq9) {
-                    ResultCard( // カスタムビュー: 結果カード
-                        title: "抑うつ症状（PHQ-9）", // カードタイトル
-                        score: phq9Score, // 計算されたスコア
-                        maxScore: 27, // 最大スコア
-                        interpretation: phq9Interpretation, // 解釈結果
-                        color: phq9Color // 結果に対応する色
-                    )
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("振り返りの記録")
+                    .font(.largeTitle.bold())
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                ForEach(SelfCheckType.guidedReflectionTypes, id: \.self) { type in
+                    if selectedTests.contains(type) {
+                        SelfCheckObservationCard(
+                            result: makeResult(for: type),
+                            guidance: type.definition.resultGuidance
+                        )
+                    }
                 }
-                
-                if selectedTests.contains(.gad7) {
-                    ResultCard(
-                        title: "不安症状（GAD-7）",
-                        score: gad7Score,
-                        maxScore: 21,
-                        interpretation: gad7Interpretation,
-                        color: gad7Color
-                    )
+
+                if selectedTests.contains(where: { $0.definition.evidenceLevel == .standardizedInstrument }) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("標準尺度は現在利用できません")
+                            .font(.headline)
+                        Text("出典、対象年齢、採点方法、利用条件、安全導線の確認が終わるまで、新しい結果は作成しません。")
+                            .font(.subheadline)
+                            .foregroundStyle(DiaryTheme.muted)
+                    }
+                    .diarySurface(padding: 16, radius: 16)
                 }
-                
-                if selectedTests.contains(.k6) {
-                    ResultCard(
-                        title: "心理的苦痛（K6）",
-                        score: k6Score,
-                        maxScore: 24,
-                        interpretation: k6Interpretation,
-                        color: k6Color
-                    )
-                }
-                
-                if selectedTests.contains(.k10) {
-                    ResultCard(
-                        title: "心理的苦痛（K10）",
-                        score: k10Score,
-                        maxScore: 40,
-                        interpretation: k10Interpretation,
-                        color: k10Color
-                    )
-                }
-                
-                if selectedTests.contains(.mutualLove) {
-                    LoveResultCard( // 恋愛結果カード
-                        title: "関係性を振り返る",
-                        score: mutualLoveScore,
-                        maxScore: 40,
-                        interpretation: mutualLoveInterpretation,
-                        description: mutualLoveDescription, // 詳細な説明
-                        color: .pink // 恋愛関連の色
-                    )
-                }
-                
-                if selectedTests.contains(.romanticSign) {
-                    LoveResultCard(
-                        title: "やりとりを振り返る",
-                        score: romanticSignScore,
-                        maxScore: 40,
-                        interpretation: romanticSignInterpretation,
-                        description: romanticSignDescription,
-                        color: .red
-                    )
-                }
-                
-                if selectedTests.contains(.smartphoneBrain) {
-                    DigitalHealthResultCard( // デジタル健康結果カード
-                        title: "スマホとの付き合い方を振り返る",
-                        score: smartphoneBrainScore,
-                        maxScore: 48,
-                        interpretation: smartphoneBrainInterpretation,
-                        description: smartphoneBrainDescription,
-                        color: .orange
-                    )
-                }
-                
-                if selectedTests.contains(.stressCheck) {
-                    StressResultCard( // ストレス結果カード
-                        title: "ストレスチェック",
-                        score: stressCheckScore,
-                        maxScore: 80,
-                        interpretation: stressCheckInterpretation,
-                        description: stressCheckDescription,
-                        color: .green
-                    )
-                }
-                
-                // メンタルヘルス関連のテストが選択されている場合に専門家アドバイスを表示
-                if selectedTests.contains(.phq9) || selectedTests.contains(.gad7) ||
-                   selectedTests.contains(.k6) || selectedTests.contains(.k10) {
-                    ProfessionalAdviceView( // カスタムビュー: 専門家アドバイス
-                        phq9Score: selectedTests.contains(.phq9) ? phq9Score : nil, // スコアがあれば渡す
-                        gad7Score: selectedTests.contains(.gad7) ? gad7Score : nil,
-                        k6Score: selectedTests.contains(.k6) ? k6Score : nil,
-                        k10Score: selectedTests.contains(.k10) ? k10Score : nil
-                    )
-                }
-                
-                // 恋愛関連のテストが選択されている場合に恋愛アドバイスを表示
-                if selectedTests.contains(.mutualLove) || selectedTests.contains(.romanticSign) {
-                    LoveAdviceView( // カスタムビュー: 恋愛アドバイス
-                        mutualLoveScore: selectedTests.contains(.mutualLove) ? mutualLoveScore : nil,
-                        romanticSignScore: selectedTests.contains(.romanticSign) ? romanticSignScore : nil
-                    )
-                }
-                
-                // デジタル健康テストが選択されている場合にデジタル健康アドバイスを表示
-                if selectedTests.contains(.smartphoneBrain) {
-                    DigitalHealthAdviceView(smartphoneBrainScore: smartphoneBrainScore) // カスタムビュー: デジタル健康アドバイス
-                }
-                
-                // ストレスチェックが選択されている場合にストレスアドバイスを表示
-                if selectedTests.contains(.stressCheck) {
-                    StressAdviceView(stressScore: stressCheckScore) // カスタムビュー: ストレスアドバイス
-                }
-                
-                // メンタルヘルス関連のテストが選択されている場合に相談窓口を表示
-                if selectedTests.contains(.phq9) || selectedTests.contains(.gad7) ||
-                   selectedTests.contains(.k6) || selectedTests.contains(.k10) {
-                    ConsultationResourcesView() // カスタムビュー: 相談窓口・リソース
-                }
-                
-                // 結果保存ボタンと新しいテスト開始ボタン
+
+                Text("ここに表示されるのは、選択した回答を整理したものです。病名、重症度、他人の気持ちを決めるものではありません。")
+                    .font(.caption)
+                    .foregroundStyle(DiaryTheme.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
                 HStack(spacing: 12) {
-                    Button("結果を保存") { // 結果を保存ボタン
-                        saveAssessment() // saveAssessment()関数を呼び出す
-                    }
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.green.gradient) // 緑色のグラデーション背景
-                    .cornerRadius(12)
-                    
-                    Button("新しいテスト") { // 新しいテストボタン
-                        resetForNewTest() // resetForNewTest()関数を呼び出して初期状態に戻す
-                    }
-                    .font(.headline)
-                    .foregroundColor(.blue)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.blue.opacity(0.1)) // 薄い青色の背景
-                    .cornerRadius(12)
-                    .overlay( // 外枠線
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue, lineWidth: 1) // 青色の線
-                    )
+                    Button("結果を保存") { saveAssessment() }
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(DiaryTheme.primary, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                    Button("新しい振り返り") { resetForNewTest() }
+                        .font(.headline)
+                        .foregroundStyle(DiaryTheme.primary)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(DiaryTheme.accentSoft, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
-                .padding(.horizontal) // 水平方向にパディング
             }
-            .padding() // VStack全体にパディング
+            .padding()
+            .frame(maxWidth: 720)
+            .frame(maxWidth: .infinity)
         }
+    }
+
+    private func makeResult(for type: SelfCheckType) -> SelfCheckResult {
+        SelfCheckSession(type: type, answers: getAnswers(for: type)).makeResult()
     }
     
     // 現在のテストタイプに応じて、画面に表示する指示テキストを取得する関数
@@ -625,193 +526,6 @@ struct MentalHealthCheckView: View {
     }
     
     // PHQ-9テストの合計スコアを計算する計算プロパティ
-    private var phq9Score: Int {
-        phq9Answers.reduce(0, +) // 回答配列の要素を合計
-    }
-    
-    // GAD-7テストの合計スコアを計算する計算プロパティ
-    private var gad7Score: Int {
-        gad7Answers.reduce(0, +)
-    }
-    
-    // K6テストの合計スコアを計算する計算プロパティ
-    private var k6Score: Int {
-        k6Answers.reduce(0, +)
-    }
-    
-    // K10テストの合計スコアを計算する計算プロパティ
-    private var k10Score: Int {
-        k10Answers.reduce(0, +)
-    }
-    
-    // 両思い診断の合計スコアを計算する計算プロパティ
-    private var mutualLoveScore: Int {
-        mutualLoveAnswers.reduce(0, +)
-    }
-    
-    // 脈あり診断の合計スコアを計算する計算プロパティ
-    private var romanticSignScore: Int {
-        romanticSignAnswers.reduce(0, +)
-    }
-    
-    // スマホ脳チェックの合計スコアを計算する計算プロパティ
-    private var smartphoneBrainScore: Int {
-        smartphoneBrainAnswers.reduce(0, +)
-    }
-    
-    // ストレスチェックの合計スコアを計算する計算プロパティ
-    private var stressCheckScore: Int {
-        stressCheckAnswers.reduce(0, +)
-    }
-    
-    // PHQ-9スコアに基づいた解釈結果を返す計算プロパティ
-    private var phq9Interpretation: String {
-        switch phq9Score {
-        case 0...4: return "軽微" // 0-4点: 軽微
-        case 5...9: return "軽度" // 5-9点: 軽度
-        case 10...14: return "中等度" // 10-14点: 中等度
-        case 15...19: return "やや重度" // 15-19点: やや重度
-        default: return "重度" // 20点以上: 重度
-        }
-    }
-    
-    // GAD-7スコアに基づいた解釈結果を返す計算プロパティ
-    private var gad7Interpretation: String {
-        switch gad7Score {
-        case 0...4: return "軽微" // 0-4点: 軽微
-        case 5...9: return "軽度" // 5-9点: 軽度
-        case 10...14: return "中等度" // 10-14点: 中等度
-        default: return "重度" // 15点以上: 重度
-        }
-    }
-    
-    // K6スコアに基づいた解釈結果を返す計算プロパティ
-    private var k6Interpretation: String {
-        switch k6Score {
-        case 0...4: return "軽微" // 0-4点: 軽微
-        case 5...9: return "軽度" // 5-9点: 軽度
-        case 10...14: return "中等度" // 10-14点: 中等度
-        case 15...19: return "やや重度" // 15-19点: やや重度
-        default: return "重度" // 20点以上: 重度
-        }
-    }
-    
-    // K10スコアに基づいた解釈結果を返す計算プロパティ
-    private var k10Interpretation: String {
-        switch k10Score {
-        case 0...7: return "軽微" // 0-7点: 軽微
-        case 8...15: return "軽度" // 8-15点: 軽度
-        case 16...24: return "中等度" // 16-24点: 中等度
-        case 25...30: return "やや重度" // 25-30点: やや重度
-        default: return "重度" // 31点以上: 重度
-        }
-    }
-    
-    // 両思い診断スコアに基づいた解釈結果を返す計算プロパティ
-    private var mutualLoveInterpretation: String {
-        switch mutualLoveScore {
-        case 0...10: return "気づきは少なめ"
-        case 11...20: return "いくつか気づきあり"
-        case 21...30: return "関係を振り返る材料あり"
-        case 31...40: return "多くの気づきあり"
-        default: return "記録を確認"
-        }
-    }
-    
-    // 脈あり診断スコアに基づいた解釈結果を返す計算プロパティ
-    private var romanticSignInterpretation: String {
-        switch romanticSignScore {
-        case 0...10: return "気づきは少なめ"
-        case 11...20: return "いくつか気づきあり"
-        case 21...30: return "やりとりを振り返る材料あり"
-        case 31...40: return "多くの気づきあり"
-        default: return "記録を確認"
-        }
-    }
-    
-    // スマホ脳チェックスコアに基づいた解釈結果を返す計算プロパティ
-    private var smartphoneBrainInterpretation: String {
-        switch smartphoneBrainScore {
-        case 0...12: return "気づきは少なめ"
-        case 13...24: return "いくつか気づきあり"
-        case 25...36: return "使い方を見直す材料あり"
-        case 37...48: return "生活との関わりを振り返る材料あり"
-        default: return "記録を確認"
-        }
-    }
-    
-    // ストレスチェックスコアに基づいた解釈結果を返す計算プロパティ
-    private var stressCheckInterpretation: String {
-        switch stressCheckScore {
-        case 0...20: return "気づきは少なめ"
-        case 21...40: return "いくつか気づきあり"
-        case 41...60: return "負担を振り返る材料あり"
-        case 61...80: return "相談や休息を考える材料あり"
-        default: return "記録を確認"
-        }
-    }
-    
-    // 両思い診断スコアに基づいた詳細な説明文を返す計算プロパティ
-    private var mutualLoveDescription: String {
-        "この結果は相手の気持ちや関係の答えではありません。自分が見た出来事や感じたことを、会話や距離感を考える材料として使ってください。"
-    }
-    
-    // 脈あり診断スコアに基づいた詳細な説明文を返す計算プロパティ
-    private var romanticSignDescription: String {
-        "相手の考えや気持ちは、この振り返りから決められません。無理に結論を出さず、自分が安心できるペースと境界線を大切にしてください。"
-    }
-    
-    // スマホ脳チェックスコアに基づいた詳細な説明文を返す計算プロパティ
-    private var smartphoneBrainDescription: String {
-        "この結果は良し悪しや健康状態を判定するものではありません。使った場面、眠りや集中との関係、楽になった工夫を自分の記録として眺めてください。"
-    }
-    
-    // ストレスチェックスコアに基づいた詳細な説明文を返す計算プロパティ
-    private var stressCheckDescription: String {
-        "この画面は職場向けの標準化チェックを再開した場合にも、状態を断定するためには使いません。今の負担や、休息・相談につながる気づきを記録するための材料です。"
-    }
-    
-    // PHQ-9スコアに基づいた結果の色を返す計算プロパティ
-    private var phq9Color: Color {
-        switch phq9Score {
-        case 0...4: return .green // 軽微
-        case 5...9: return .yellow // 軽度
-        case 10...14: return .orange // 中等度
-        default: return .red // やや重度以上
-        }
-    }
-    
-    // GAD-7スコアに基づいた結果の色を返す計算プロパティ
-    private var gad7Color: Color {
-        switch gad7Score {
-        case 0...4: return .green
-        case 5...9: return .yellow
-        case 10...14: return .orange
-        default: return .red
-        }
-    }
-    
-    // K6スコアに基づいた結果の色を返す計算プロパティ
-    private var k6Color: Color {
-        switch k6Score {
-        case 0...4: return .green
-        case 5...9: return .yellow
-        case 10...14: return .orange
-        default: return .red
-        }
-    }
-    
-    // K10スコアに基づいた結果の色を返す計算プロパティ
-    private var k10Color: Color {
-        switch k10Score {
-        case 0...7: return .green // 軽微
-        case 8...15: return .yellow // 軽度
-        case 16...24: return .orange // 中等度
-        default: return .red // やや重度以上
-        }
-    }
-    
-    // 選択されたテストを開始する関数
     private func startSelectedTests() {
         // 一時停止中のチェックが状態に残っていても、実行キューには入れない。
         testQueue = selectedTests.filter { !$0.isPaused }
@@ -1003,266 +717,6 @@ struct QuestionCard: View {
 }
 
 // 結果カードのカスタムビュー（PHQ-9, GAD-7などの一般的な結果表示用）
-struct ResultCard: View {
-    let title: String // カードのタイトル
-    let score: Int // ユーザーのスコア
-    let maxScore: Int // 最大スコア
-    let interpretation: String // スコアの解釈結果
-    let color: Color // 結果の色
-    
-    var body: some View {
-        VStack(spacing: 12) {
-            Text(title) // タイトル
-                .font(.headline.bold()) // 太字の見出しフォント
-            
-            Text("\(score)/\(maxScore)") // スコア表示
-                .font(.title.bold()) // 太字のタイトルフォント
-                .foregroundColor(color) // 結果の色
-            
-            Text(interpretation) // 解釈結果
-                .font(.subheadline)
-                .padding(.horizontal, 16) // 水平パディング
-                .padding(.vertical, 8) // 垂直パディング
-                .background(color.opacity(0.2)) // 結果の色を薄めた背景
-                .cornerRadius(20) // 角丸
-        }
-        .frame(maxWidth: .infinity) // 幅を最大に
-        .padding() // カード内部パディング
-        .background(.thinMaterial) // 半透明の背景
-        .cornerRadius(16) // 角丸
-        .overlay( // カードの縁取り
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color, lineWidth: 2) // 結果の色で太さ2の線
-        )
-    }
-}
-
-// 恋愛診断の結果カードカスタムビュー
-struct LoveResultCard: View {
-    let title: String
-    let score: Int
-    let maxScore: Int
-    let interpretation: String
-    let description: String // 詳細な説明文
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Text(title)
-                .font(.headline.bold())
-            
-            Text("\(score)/\(maxScore)")
-                .font(.title.bold())
-                .foregroundColor(color)
-            
-            Text(interpretation)
-                .font(.subheadline)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(color.opacity(0.2))
-                .cornerRadius(20)
-            
-            Text(description) // 詳細な説明文を表示
-                .font(.body)
-                .multilineTextAlignment(.center) // 中央揃え
-                .padding(.horizontal)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.thinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color, lineWidth: 2)
-        )
-    }
-}
-
-// デジタル健康診断の結果カードカスタムビュー
-struct DigitalHealthResultCard: View {
-    let title: String
-    let score: Int
-    let maxScore: Int
-    let interpretation: String
-    let description: String // 詳細な説明文
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Text(title)
-                .font(.headline.bold())
-            
-            Text("\(score)/\(maxScore)")
-                .font(.title.bold())
-                .foregroundColor(color)
-            
-            Text(interpretation)
-                .font(.subheadline)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(color.opacity(0.2))
-                .cornerRadius(20)
-            
-            Text(description) // 詳細な説明文を表示
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.thinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color, lineWidth: 2)
-        )
-    }
-}
-
-// ストレスチェックの結果カードカスタムビュー
-struct StressResultCard: View {
-    let title: String
-    let score: Int
-    let maxScore: Int
-    let interpretation: String
-    let description: String // 詳細な説明文
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 16) {
-            Text(title)
-                .font(.headline.bold())
-            
-            Text("\(score)/\(maxScore)")
-                .font(.title.bold())
-                .foregroundColor(color)
-            
-            Text(interpretation)
-                .font(.subheadline)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(color.opacity(0.2))
-                .cornerRadius(20)
-            
-            Text(description) // 詳細な説明文を表示
-                .font(.body)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        .background(.thinMaterial)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(color, lineWidth: 2)
-        )
-    }
-}
-
-// 専門的なアドバイスを表示するビュー
-struct ProfessionalAdviceView: View {
-    // オプショナルなスコア値
-    let phq9Score: Int?
-    let gad7Score: Int?
-    let k6Score: Int?
-    let k10Score: Int?
-    
-    // アドバイスのテキストを計算するプライベートプロパティ
-    private var advice: String {
-        "標準化されたチェックの数値だけで、心の状態や必要な支援を決めることはできません。気になることが続く場合は、自分の言葉で家族・先生・専門家へ相談してください。"
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("参考にするための案内")
-                .font(.headline.bold())
-            
-            Text(advice) // 計算されたアドバイスを表示
-                .font(.body)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading) // 幅を最大にし、左揃え
-        .padding()
-        .background(Color.blue.opacity(0.1)) // 背景色
-        .cornerRadius(12) // 角丸
-    }
-}
-
-// 恋愛アドバイスを表示するビュー
-struct LoveAdviceView: View {
-    // オプショナルなスコア値
-    let mutualLoveScore: Int?
-    let romanticSignScore: Int?
-    
-    // アドバイスのテキストを計算するプライベートプロパティ
-    private var advice: String {
-        "相手の気持ちを推測したり、関係に名前をつけたりするための結果ではありません。自分が安心できる距離感と、話してみたいことを考える材料にしてください。"
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("関係性を振り返るための案内")
-                .font(.headline.bold())
-            
-            Text(advice) // 計算されたアドバイスを表示
-                .font(.body)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.pink.opacity(0.1)) // 背景色
-        .cornerRadius(12)
-    }
-}
-
-// デジタル健康アドバイスを表示するビュー
-struct DigitalHealthAdviceView: View {
-    let smartphoneBrainScore: Int // スマホ脳チェックのスコア
-    
-    // アドバイスのテキストを計算するプライベートプロパティ
-    private var advice: String {
-        "スマートフォンの使用を良し悪しで判定しません。眠り、集中、気分、友人との時間など、自分が大切にしたいこととの関係を少しずつ観察できます。"
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("スマホとの付き合い方を振り返る案内")
-                .font(.headline.bold())
-            
-            Text(advice) // 計算されたアドバイスを表示
-                .font(.body)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.orange.opacity(0.1)) // 背景色
-        .cornerRadius(12)
-    }
-}
-
-// ストレス管理アドバイスを表示するビュー
-struct StressAdviceView: View {
-    let stressScore: Int // ストレスチェックのスコア
-    
-    // アドバイスのテキストを計算するプライベートプロパティ
-    private var advice: String {
-        "ここに表示される数値は状態の良し悪しを決めません。負担が続く場合は、休むことや、家族・先生・専門家に相談することも選択肢です。"
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("負担を振り返るための案内")
-                .font(.headline.bold())
-            
-            Text(advice) // 計算されたアドバイスを表示
-                .font(.body)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color.green.opacity(0.1)) // 背景色
-        .cornerRadius(12)
-    }
-}
-
-// 相談窓口やリソースのリンクを表示するビュー
 struct ConsultationResourcesView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
