@@ -58,7 +58,7 @@ final class JournalInsightsSnapshotTests: XCTestCase {
         let now = Date(timeIntervalSince1970: 1_750_000_000)
         let today = calendar.startOfDay(for: now)
         let date = { (offset: Int) in
-            calendar.date(byAdding: .day, value: offset, to: today)!
+            self.calendar.date(byAdding: .day, value: offset, to: today)!
         }
         let entries = [
             makeEntry(date: date(0).addingTimeInterval(3_600), score: 2, tag: "学校"),

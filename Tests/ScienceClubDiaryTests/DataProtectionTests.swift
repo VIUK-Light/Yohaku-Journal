@@ -122,7 +122,7 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         }
     }
 
-    func testAssessmentValidationRejectsEachInvalidBoundaryIndividually() {
+    func testAssessmentValidationRejectsEachInvalidBoundaryIndividually() throws {
         let invalidCases: [(String, ArchivedMentalHealthAssessment, DiaryArchiveValidationError)] = [
             ("PHQ回答 -1", makeAssessment(phq9Answers: [-1]), .invalidAssessmentValue),
             ("PHQ回答 4", makeAssessment(phq9Answers: [4]), .invalidAssessmentValue),
@@ -163,7 +163,7 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         ]
 
         for (name, assessment, expectedError) in invalidCases {
-            XCTContext.runActivity(named: name) { _ in
+            try XCTContext.runActivity(named: name) { _ in
                 XCTAssertThrowsError(try validate(assessment)) { error in
                     XCTAssertEqual(error as? DiaryArchiveValidationError, expectedError)
                 }

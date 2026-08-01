@@ -1,4 +1,5 @@
 import XCTest
+@testable import Science_Club_Diary
 
 final class ArticleCatalogTests: XCTestCase {
     func testArticlesHaveStableAndCompleteMetadata() {

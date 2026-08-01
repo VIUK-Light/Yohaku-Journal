@@ -379,8 +379,6 @@ struct MentalHealthCheckView: View {
         }
     }
     
-    // 結果表示画面のビュー
-    @ViewBuilder
     /// 独自チェックは診断カードではなく、回答内容を眺める事実ベースの結果にする。
     @ViewBuilder
     private var resultView: some View {
