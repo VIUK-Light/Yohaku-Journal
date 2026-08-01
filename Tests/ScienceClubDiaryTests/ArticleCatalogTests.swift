@@ -15,9 +15,10 @@ final class ArticleCatalogTests: XCTestCase {
             XCTAssertFalse(article.summary.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             XCTAssertFalse(article.content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             XCTAssertFalse(article.metadata.intendedReaders.isEmpty)
-            XCTAssertFalse(article.metadata.lastReviewed.isEmpty)
+            XCTAssertEqual(article.metadata.lastReviewed, ArticleCatalog.reviewDate)
             XCTAssertFalse(article.metadata.safetyNote.isEmpty)
             XCTAssertFalse(article.metadata.sources.isEmpty)
+            XCTAssertEqual(Set(article.metadata.sources).count, article.metadata.sources.count)
 
             for source in article.metadata.sources {
                 XCTAssertEqual(source.url.scheme, "https")
