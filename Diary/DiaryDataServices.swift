@@ -81,14 +81,23 @@ enum DiaryArchiveDataService {
         in context: ModelContext
     ) throws -> DiaryArchiveRestorePreview {
         try archive.validate()
-        let localMoodIDs = try uniqueIDs(
-            context.fetch(FetchDescriptor<MoodEntry>()).map(\.id)
+        let localMoodIDs = try fetchMatchingIDs(
+            descriptor: FetchDescriptor<MoodEntry>(),
+            requestedIDs: Set(archive.moodEntries.map(\.id)),
+            id: \MoodEntry.id,
+            in: context
         )
-        let localAssessmentIDs = try uniqueIDs(
-            context.fetch(FetchDescriptor<MentalHealthAssessment>()).map(\.id)
+        let localAssessmentIDs = try fetchMatchingIDs(
+            descriptor: FetchDescriptor<MentalHealthAssessment>(),
+            requestedIDs: Set(archive.assessments.map(\.id)),
+            id: \MentalHealthAssessment.id,
+            in: context
         )
-        let localSafetyIDs = try uniqueIDs(
-            context.fetch(FetchDescriptor<LightSafetyCheckRecord>()).map(\.id)
+        let localSafetyIDs = try fetchMatchingIDs(
+            descriptor: FetchDescriptor<LightSafetyCheckRecord>(),
+            requestedIDs: Set(archive.safetyChecks.map(\.id)),
+            id: \LightSafetyCheckRecord.id,
+            in: context
         )
 
         return DiaryArchiveRestorePreview(
@@ -112,12 +121,24 @@ enum DiaryArchiveDataService {
             try context.save()
         }
 
-        let localMoodEntries = try context.fetch(FetchDescriptor<MoodEntry>())
-        let localAssessments = try context.fetch(FetchDescriptor<MentalHealthAssessment>())
-        let localSafetyChecks = try context.fetch(FetchDescriptor<LightSafetyCheckRecord>())
-        let moodByID = try uniqueModels(localMoodEntries, id: \.id)
-        let assessmentByID = try uniqueModels(localAssessments, id: \.id)
-        let safetyByID = try uniqueModels(localSafetyChecks, id: \.id)
+        let moodByID = try fetchMatchingModels(
+            descriptor: FetchDescriptor<MoodEntry>(),
+            requestedIDs: Set(archive.moodEntries.map(\.id)),
+            id: \MoodEntry.id,
+            in: context
+        )
+        let assessmentByID = try fetchMatchingModels(
+            descriptor: FetchDescriptor<MentalHealthAssessment>(),
+            requestedIDs: Set(archive.assessments.map(\.id)),
+            id: \MentalHealthAssessment.id,
+            in: context
+        )
+        let safetyByID = try fetchMatchingModels(
+            descriptor: FetchDescriptor<LightSafetyCheckRecord>(),
+            requestedIDs: Set(archive.safetyChecks.map(\.id)),
+            id: \LightSafetyCheckRecord.id,
+            in: context
+        )
 
         let previousAutosave = context.autosaveEnabled
         context.autosaveEnabled = false
@@ -220,27 +241,65 @@ enum DiaryArchiveDataService {
         }
     }
 
-    private static func uniqueIDs(_ ids: [UUID]) throws -> Set<UUID> {
-        let result = Set(ids)
-        guard result.count == ids.count else {
-            throw DiaryDataServiceError.duplicateLocalIdentifier
+    private static let fetchPageSize = 512
+
+    private static func fetchMatchingIDs<Model: PersistentModel>(
+        descriptor: FetchDescriptor<Model>,
+        requestedIDs: Set<UUID>,
+        id keyPath: KeyPath<Model, UUID>,
+        in context: ModelContext
+    ) throws -> Set<UUID> {
+        guard !requestedIDs.isEmpty else { return [] }
+
+        var descriptor = descriptor
+        descriptor.fetchLimit = fetchPageSize
+        descriptor.fetchOffset = 0
+        var matches = Set<UUID>()
+
+        while true {
+            let batch = try context.fetch(descriptor)
+            for model in batch {
+                let identifier = model[keyPath: keyPath]
+                guard requestedIDs.contains(identifier) else { continue }
+                guard matches.insert(identifier).inserted else {
+                    throw DiaryDataServiceError.duplicateLocalIdentifier
+                }
+            }
+            guard batch.count == fetchPageSize else { break }
+            descriptor.fetchOffset = (descriptor.fetchOffset ?? 0) + batch.count
         }
-        return result
+
+        return matches
     }
 
-    private static func uniqueModels<Model>(
-        _ models: [Model],
-        id keyPath: KeyPath<Model, UUID>
+    private static func fetchMatchingModels<Model: PersistentModel>(
+        descriptor: FetchDescriptor<Model>,
+        requestedIDs: Set<UUID>,
+        id keyPath: KeyPath<Model, UUID>,
+        in context: ModelContext
     ) throws -> [UUID: Model] {
-        var result: [UUID: Model] = [:]
-        for model in models {
-            let identifier = model[keyPath: keyPath]
-            guard result[identifier] == nil else {
-                throw DiaryDataServiceError.duplicateLocalIdentifier
+        guard !requestedIDs.isEmpty else { return [:] }
+
+        var descriptor = descriptor
+        descriptor.fetchLimit = fetchPageSize
+        descriptor.fetchOffset = 0
+        var matches: [UUID: Model] = [:]
+
+        while true {
+            let batch = try context.fetch(descriptor)
+            for model in batch {
+                let identifier = model[keyPath: keyPath]
+                guard requestedIDs.contains(identifier) else { continue }
+                guard matches[identifier] == nil else {
+                    throw DiaryDataServiceError.duplicateLocalIdentifier
+                }
+                matches[identifier] = model
             }
-            result[identifier] = model
+            guard batch.count == fetchPageSize else { break }
+            descriptor.fetchOffset = (descriptor.fetchOffset ?? 0) + batch.count
         }
-        return result
+
+        return matches
     }
 }
 
