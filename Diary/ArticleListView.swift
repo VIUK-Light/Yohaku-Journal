@@ -57,7 +57,7 @@ struct ArticleListView: View {
                 }
             }
             .sheet(isPresented: $showingSupportResources) {
-                ConsultationResourcesView()
+                SupportResourcesView()
             }
         }
         .tint(DiaryTheme.accent)
@@ -215,7 +215,7 @@ struct ArticleDetailView: View {
             }
         }
         .sheet(isPresented: $showingSupportResources) {
-            ConsultationResourcesView()
+            SupportResourcesView()
         }
     }
 
