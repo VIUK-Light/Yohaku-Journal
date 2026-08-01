@@ -44,6 +44,28 @@ final class JournalTimelineTests: XCTestCase {
         XCTAssertEqual(result[0].recordType, RecordKind.dailyReflection.storageValue)
     }
 
+    func testEventTagFilterUsesTheSameTrimmedValueAsTagMenu() {
+        let now = Date(timeIntervalSince1970: 1_750_000_000)
+        let entry = makeEntry(
+            date: now,
+            score: 5,
+            influences: [" 学校 ", "学校"]
+        )
+
+        XCTAssertEqual(JournalTimeline.eventTags(from: [entry]), ["学校"])
+
+        var query = JournalTimelineQuery()
+        query.eventTag = "学校"
+        let filtered = JournalTimeline.filtered(
+            entries: [entry],
+            query: query,
+            now: now,
+            calendar: calendar
+        )
+        XCTAssertEqual(filtered.count, 1)
+        XCTAssertTrue(filtered.first === entry)
+    }
+
     private func makeEntry(
         date: Date,
         score: Int,

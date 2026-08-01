@@ -94,8 +94,12 @@ enum JournalTimeline {
                 return false
             }
 
-            if let eventTag = query.eventTag, !entry.influences.contains(eventTag) {
-                return false
+            if let eventTag = query.eventTag {
+                let normalizedEventTag = normalizedTag(eventTag)
+                let entryTags = Set(entry.influences.map(normalizedTag).filter { !$0.isEmpty })
+                if normalizedEventTag.isEmpty || !entryTags.contains(normalizedEventTag) {
+                    return false
+                }
             }
 
             guard !normalizedText.isEmpty else { return true }
@@ -117,9 +121,13 @@ enum JournalTimeline {
     }
 
     static func eventTags(from entries: [MoodEntry]) -> [String] {
-        Set(entries.flatMap(\.influences))
-            .filter { !$0.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
+        Set(entries.flatMap(\.influences).map(normalizedTag))
+            .filter { !$0.isEmpty }
             .sorted()
+    }
+
+    private static func normalizedTag(_ value: String) -> String {
+        value.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func dateBounds(
