@@ -105,7 +105,7 @@ struct MoodJournalView: View {
             } detail: {
                 regularDetail
             }
-            .navigationSplitViewStyle(.automatic)
+            .navigationSplitViewStyle(.balanced)
             .onAppear { updateSplitVisibility(for: size) }
             .onChange(of: size) { _, newSize in updateSplitVisibility(for: newSize) }
         )
@@ -405,6 +405,14 @@ struct MoodJournalView: View {
 
     private func updateSplitVisibility(for size: CGSize) {
         guard size.width > 0, size.height > 0 else { return }
+
+        // Mac Catalystはウィンドウを横長の2カラムとして扱う。縦長の保存状態や
+        // 一時的なGeometryReaderの値で、起動直後にdetailOnlyへ落ちないようにする。
+        if DiaryRuntime.isMacWindow {
+            columnVisibility = .all
+            return
+        }
+
         columnVisibility = size.width < size.height ? .detailOnly : .all
     }
 
