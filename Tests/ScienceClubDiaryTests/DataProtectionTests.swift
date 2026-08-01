@@ -163,7 +163,7 @@ final class DiaryArchiveCryptoTests: XCTestCase {
         ]
 
         for (name, assessment, expectedError) in invalidCases {
-            XCTContext.runActivity(named: name) { _ in
+            try XCTContext.runActivity(named: name) { _ in
                 XCTAssertThrowsError(try validate(assessment)) { error in
                     XCTAssertEqual(error as? DiaryArchiveValidationError, expectedError)
                 }
