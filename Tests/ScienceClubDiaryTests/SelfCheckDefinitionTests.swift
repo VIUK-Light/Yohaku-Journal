@@ -28,10 +28,39 @@ final class SelfCheckDefinitionTests: XCTestCase {
         for type in SelfCheckType.allCases {
             XCTAssertFalse(type.definition.sourceStatus.isEmpty)
         }
-        XCTAssertFalse(SelfCheckType.phq9.definition.availability.isAvailable)
-        XCTAssertFalse(SelfCheckType.gad7.definition.availability.isAvailable)
+        let standardizedTypes: [SelfCheckType] = [.phq9, .gad7, .k6, .k10, .stressCheck]
+        for type in standardizedTypes {
+            XCTAssertFalse(type.definition.availability.isAvailable, type.rawValue)
+            XCTAssertEqual(type.definition.availability.shortLabel, "根拠と安全性を検証中", type.rawValue)
+        }
         XCTAssertTrue(SelfCheckType.mutualLove.definition.availability.isAvailable)
         XCTAssertEqual(SelfCheckType.mutualLove.definition.evidenceLevel, .guidedReflection)
+    }
+
+    func testUnavailableStandardizedChecksCannotBeSaved() throws {
+        let standardizedTypes: [SelfCheckType] = [.phq9, .gad7, .k6, .k10, .stressCheck]
+
+        for type in standardizedTypes {
+            let draft = SelfCheckResultDraft(
+                selectedTests: [type],
+                phq9Answers: [],
+                gad7Answers: [],
+                k6Answers: [],
+                k10Answers: [],
+                mutualLoveAnswers: [],
+                romanticSignAnswers: [],
+                smartphoneBrainAnswers: [],
+                stressCheckAnswers: []
+            )
+
+            XCTAssertThrowsError(
+                try MentalHealthAssessmentSaveService().save(draft: draft, in: context)
+            ) { error in
+                XCTAssertEqual(error as? SelfCheckSaveError, .unavailableTypes([type]))
+            }
+        }
+
+        XCTAssertTrue(try context.fetch(FetchDescriptor<MentalHealthAssessment>()).isEmpty)
     }
 
     func testOnlyChecksWithCrisisItemsRequireSafetyGate() {
