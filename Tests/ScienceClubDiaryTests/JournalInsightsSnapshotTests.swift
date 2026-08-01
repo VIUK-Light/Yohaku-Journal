@@ -115,8 +115,10 @@ final class JournalInsightsSnapshotTests: XCTestCase {
         XCTAssertEqual(snapshot.averageMood, 6)
         XCTAssertEqual(snapshot.moodTrend.first?.averageScore, 6)
         XCTAssertEqual(snapshot.moodTrend.first?.entryCount, 2)
+        XCTAssertEqual(snapshot.moodTrend.first?.validMoodCount, 1)
         XCTAssertNil(snapshot.eventBreakdowns.first?.averageMood)
         XCTAssertEqual(snapshot.eventBreakdowns.first?.entryCount, 2)
+        XCTAssertEqual(snapshot.eventBreakdowns.first?.validMoodCount, 1)
     }
 
     private func makeEntry(date: Date, score: Int, tag: String) -> MoodEntry {

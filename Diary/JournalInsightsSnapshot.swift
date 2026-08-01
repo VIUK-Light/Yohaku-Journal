@@ -31,6 +31,7 @@ struct MoodTrendPoint: Identifiable {
     let date: Date
     let averageScore: Double
     let entryCount: Int
+    let validMoodCount: Int
 
     var id: Date { date }
 }
@@ -39,6 +40,7 @@ struct EventBreakdown: Identifiable {
     let name: String
     let entryCount: Int
     let averageMood: Double?
+    let validMoodCount: Int
 
     var id: String { name }
 }
@@ -113,7 +115,8 @@ enum JournalInsightsCalculator {
             return MoodTrendPoint(
                 date: day,
                 averageScore: Double(aggregate.total) / Double(aggregate.moodCount),
-                entryCount: aggregate.recordCount
+                entryCount: aggregate.recordCount,
+                validMoodCount: aggregate.moodCount
             )
         }
 
@@ -123,7 +126,8 @@ enum JournalInsightsCalculator {
                 entryCount: aggregate.recordCount,
                 averageMood: aggregate.moodCount >= 3
                     ? Double(aggregate.total) / Double(aggregate.moodCount)
-                    : nil
+                    : nil,
+                validMoodCount: aggregate.moodCount
             )
         }
         .sorted {

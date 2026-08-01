@@ -139,7 +139,7 @@ struct JournalInsightsView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 Text("平均 \(formatted(point.averageScore))")
                                     .monospacedDigit()
-                                Text("\(point.entryCount)件")
+                                Text(entryCountLabel(for: point))
                                     .foregroundStyle(DiaryTheme.muted)
                             }
                             .font(.caption)
@@ -175,7 +175,7 @@ struct JournalInsightsView: View {
                                 .font(.subheadline.monospacedDigit())
                                 .foregroundStyle(DiaryTheme.muted)
                             if let averageMood = item.averageMood {
-                                Text("平均 \(formatted(averageMood))")
+                                Text("平均 \(formatted(averageMood))（数値\(item.validMoodCount)件）")
                                     .font(.caption.monospacedDigit())
                                     .foregroundStyle(DiaryTheme.muted)
                             }
@@ -232,13 +232,20 @@ struct JournalInsightsView: View {
     private var moodTrendSummary: String {
         let days = snapshot.moodTrend.count
         let preview = snapshot.moodTrend.prefix(5).map {
-            "\(dateString($0.date)) 平均\(formatted($0.averageScore))、\($0.entryCount)件"
+            "\(dateString($0.date)) 平均\(formatted($0.averageScore))、\(entryCountLabel(for: $0))"
         }.joined(separator: "。")
         let suffix = days > 5 ? "。残りは日ごとの数値で確認できます" : ""
         return "\(days)日分の記録。\(preview)\(suffix)"
     }
 
     private func formatted(_ value: Double?) -> String { value.map { String(format: "%.1f", $0) } ?? "—" }
+
+    private func entryCountLabel(for point: MoodTrendPoint) -> String {
+        if point.entryCount == point.validMoodCount {
+            return "\(point.entryCount)件"
+        }
+        return "\(point.entryCount)件（数値\(point.validMoodCount)件）"
+    }
 
     private func dateString(_ date: Date) -> String {
         let formatter = DateFormatter()
